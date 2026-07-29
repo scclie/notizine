@@ -32,6 +32,19 @@
     </ctx>
   </header>
   <main id="content">
+    <ctx :if="$site.asset('notizine.json').ziggy().get('features').get('breadcrumbs')">
+      <ctx :if="$page.isSection().not()">
+        <ctx :if="$page.parentSection().link().eql($site.index().link()).not()">
+          <nav class="breadcrumbs">
+            <a href="$site.index().link()" :text="$i18n.get('home')"></a>
+            <span> / </span>
+            <a href="$page.parentSection().link()" :text="$page.parentSection().title"></a>
+            <span> / </span>
+            <span :text="$page.title"></span>
+          </nav>
+        </ctx>
+      </ctx>
+    </ctx>
     <super>
   </main>
   <footer id="footer">

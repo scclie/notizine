@@ -19,7 +19,7 @@
     <div :html="$page.content()"></div>
     <ctx :if="$page.tags.len.gt(0)">
       <ctx :loop="$page.tags">
-        <span class="tag" :text="$loop.it"></span>
+        <a class="tag" href="$site.page('tags').link().suffix('?tag=').suffix($loop.it)" :text="$loop.it"></a>
       </ctx>
     </ctx>
     <ctx :if="$page.hasPrev().or($page.hasNext())">

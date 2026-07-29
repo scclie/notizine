@@ -285,7 +285,7 @@ summary:hover {
   color: var(--accent2);
 }
 
-.tag {
+#content a.tag, #content .tag {
   display: inline-block;
   background: var(--tag-bg);
   color: var(--tag-text);
@@ -293,6 +293,13 @@ summary:hover {
   border-radius: 3px;
   font-size: 0.85em;
   margin: 0.15em 0.1em;
+  text-decoration: none;
+}
+
+#content a.tag:hover, #content a.tag:visited, #content .tag:hover {
+  background: var(--accent2);
+  color: var(--nord0);
+  text-decoration: none;
 }
 
 #footer {
@@ -436,3 +443,19 @@ pre code .parameter { color: var(--nord12); }
 pre code .label { color: var(--nord11); }
 pre code .attribute { color: var(--nord12); }
 pre code .tag { color: var(--nord11); }
+
+.breadcrumbs {
+  font-size: 0.85em;
+  margin-bottom: 1rem;
+  color: var(--text-muted);
+}
+
+.breadcrumbs a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  color: var(--accent2);
+  text-decoration: underline;
+}
