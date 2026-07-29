@@ -1,0 +1,11 @@
+{
+  "name": "notizine",
+  "version": "0.1.0",
+  "description": "Multilingual Zine-based generator for digital gardens and blogs",
+  "private": true,
+  "scripts": {
+    "dev": "zine",
+    "build": "zine release --force",
+    "preview": "zine release --force && npx serve public"
+  }
+}

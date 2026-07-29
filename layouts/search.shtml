@@ -1,0 +1,23 @@
+<extend template="base.shtml">
+<head id="head">
+  <meta property="og:type" content="website">
+</head>
+<main id="content">
+  <h1 :text="$page.title"></h1>
+  <input type="search" id="search-input" placeholder="...">
+  <div id="search-results"></div>
+  <script>
+    const searchIndex = [
+      <ctx :loop="$site.index().leaves()">{t:"$loop.it.title",u:"$loop.it.link()"},</ctx>
+    ];
+    const input = document.getElementById("search-input");
+    const results = document.getElementById("search-results");
+    input.addEventListener("input", function() {
+      const q = this.value.toLowerCase();
+      if (!q) { results.innerHTML = ""; return; }
+      const hits = searchIndex.filter(function(p) { return p.t.toLowerCase().includes(q); });
+      results.innerHTML = hits.map(function(p) { return '<article><a href="' + p.u + '">' + p.t + '</a></article>'; }).join("");
+    });
+  </script>
+</main>
+

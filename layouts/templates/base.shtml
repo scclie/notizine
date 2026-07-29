@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="$site.localeCode()">
+<head id="head">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title :text="$page.title.suffix(' · ').suffix($site.title)"></title>
+  <meta name="description" content="$page.description">
+  <link rel="stylesheet" href="$site.asset('css/notizine.css').link()">
+  <super>
+</head>
+<body id="body">
+  <header id="header">
+    <a href="$site.index().link()" :text="$site.title"></a>
+    <nav :if="$page.locales().len.gt(1)">
+      <ctx :loop="$page.locales()">
+        <a href="$loop.it.link()" :text="$loop.it.site().localeCode()"></a>
+      </ctx>
+    </nav>
+  </header>
+  <main id="content">
+    <super>
+  </main>
+  <footer id="footer">
+    <a href="$site.index().link()" :text="$i18n.get('back_to_top')"></a>
+    <p>
+      <span :text="$i18n.get('generated_by')"></span>
+      <a href="https://zine-ssg.io">Zine</a>
+      <span :text="$i18n.get('with')"></span>
+      <a href="https://notizine.sccl.cc">notizine</a>
+    </p>
+  </footer>
+  <script :if="$site.asset('notizine.json').ziggy().get('features').get('darkmode')">
+    (function(){var e=localStorage.getItem("notizine-theme");if(e){document.documentElement.setAttribute("data-theme",e)}else if(window.matchMedia("(prefers-color-scheme:dark)").matches){document.documentElement.setAttribute("data-theme","dark")}})()
+  </script>
+</body>
+</html>

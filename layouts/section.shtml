@@ -1,0 +1,45 @@
+<extend template="base.shtml">
+<head id="head">
+  <meta property="og:type" content="website">
+</head>
+<main id="content">
+  <header>
+    <h1 :text="$page.title"></h1>
+    <ctx :if="$page.description.len().gt(0)">
+      <p :text="$page.description"></p>
+    </ctx>
+  </header>
+  <ctx :if="$page.content().len().gt(0)">
+    <div :html="$page.content()"></div>
+  </ctx>
+  <ctx :if="$page.subpages().len.gt(0)">
+    <ctx :loop="$page.subpages()">
+      <ctx :if="$loop.it.isSection().not()">
+        <article>
+          <a href="$loop.it.link()" :text="$loop.it.title"></a>
+          <time :text="$loop.it.date.format('2006-01-02')"></time>
+          <ctx :if="$loop.it.description.len().gt(0)">
+            <p :text="$loop.it.description"></p>
+          </ctx>
+        </article>
+      </ctx>
+    </ctx>
+  </ctx>
+  <ctx :if="$page.subpages().len.gt(0)">
+    <ctx :loop="$page.subpages()">
+      <ctx :if="$loop.it.isSection()">
+        <section>
+          <h2><a href="$loop.it.link()" :text="$loop.it.title"></a></h2>
+          <ctx :if="$loop.it.leaves(5).len.gt(0)">
+            <ul>
+              <li :loop="$loop.it.leaves(5)">
+                <a href="$loop.it.link()" :text="$loop.it.title"></a>
+              </li>
+            </ul>
+          </ctx>
+        </section>
+      </ctx>
+    </ctx>
+  </ctx>
+</main>
+

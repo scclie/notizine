@@ -1,0 +1,20 @@
+<extend template="base.shtml">
+<head id="head">
+  <meta property="og:type" content="website">
+</head>
+<main id="content">
+  <div :html="$page.content()"></div>
+  <ctx :if="$page.custom.get?('notizine')">
+    <ctx :if="$if.get('on_home').eql('recents')">
+      <section>
+        <h2 :text="$i18n.get('recents_title')"></h2>
+      <ctx :loop="$site.index().leaves(5)">
+        <article>
+          <a href="$loop.it.link()" :text="$loop.it.title"></a>
+        </article>
+      </ctx>
+      </section>
+    </ctx>
+  </ctx>
+</main>
+

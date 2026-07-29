@@ -1,0 +1,22 @@
+.zine_version = "0.13.0",
+.site = .multilingual(.{
+    .host_url = "https://example.com",
+    .i18n_dir_path = "i18n",
+    .layouts_dir_path = "layouts",
+    .assets_dir_path = "assets",
+    .locales = [
+        .{
+            .code = "ru",
+            .name = "Русский",
+            .site_title = "notizine",
+            .content_dir_path = "content/ru",
+        },
+        .{
+            .code = "en",
+            .name = "English",
+            .site_title = "notizine",
+            .content_dir_path = "content/en",
+            .output_prefix_override = "",
+        },
+    ],
+}),

@@ -1,0 +1,45 @@
+.zine_version = "0.13.0",
+.site = .multilingual(.{
+    .host_url = "https://example.com",
+    .i18n_dir_path = "i18n",
+    .layouts_dir_path = "layouts",
+    .assets_dir_path = "assets",
+    .locales = [
+        .{
+            .code = "ru",
+            .name = "Русский",
+            .site_title = "notizine",
+            .content_dir_path = "content/ru",
+        },
+        .{
+            .code = "en",
+            .name = "English",
+            .site_title = "notizine",
+            .content_dir_path = "content/en",
+            .output_prefix_override = "",
+        },
+    ],
+    .custom = .{
+        .notizine = .{
+            .features = .{
+                .recents = true,
+                .explorer = true,
+                .search = true,
+                .darkmode = true,
+                .translation_notice = true,
+                .tags = true,
+                .breadcrumbs = true,
+                .rss = false,
+                .inline_mode = false,
+            },
+            .language_primary = "ru",
+            .analytics = "",
+            .plausible_domain = "",
+            .comments = .{},
+            .social = .{
+                .github = "",
+                .mastodon = "",
+            },
+        },
+    },
+}),

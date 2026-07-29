@@ -1,0 +1,25 @@
+<extend template="base.shtml">
+<head id="head">
+  <meta property="og:type" content="website">
+</head>
+<main id="content">
+  <h1 :text="$page.title"></h1>
+  <ul>
+    <li :loop="$site.index().subpages()">
+      <ctx :if="$loop.it.isSection()">
+        <details>
+          <summary><a href="$loop.it.link()" :text="$loop.it.title"></a></summary>
+          <ctx :if="$loop.it.leaves().len.gt(0)">
+            <ul>
+              <li :loop="$loop.it.leaves()"><a href="$loop.it.link()" :text="$loop.it.title"></a></li>
+            </ul>
+          </ctx>
+        </details>
+      </ctx>
+      <ctx :if="$loop.it.isSection().not()">
+        <a href="$loop.it.link()" :text="$loop.it.title"></a>
+      </ctx>
+    </li>
+  </ul>
+</main>
+

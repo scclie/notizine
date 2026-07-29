@@ -1,0 +1,4 @@
+<extend template="base.shtml">
+<main id="content">
+  <h1>Not Found</h1>
+</main>

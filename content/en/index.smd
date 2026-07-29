@@ -1,0 +1,14 @@
+---
+.title = "notizine",
+.date = .date("2026-01-01T00:00:00"),
+.layout = "index.shtml",
+.custom = .{
+    .notizine = .{
+        .on_home = "recents",
+    },
+},
+---
+
+Welcome to notizine.
+
+Replace this text with your own content.
