@@ -313,6 +313,14 @@ summary:hover {
   text-decoration: underline;
 }
 
+#footer .rss-link {
+  display: inline-block;
+  margin: 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
 #footer p {
   margin: 0.3rem 0;
 }

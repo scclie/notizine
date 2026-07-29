@@ -6,6 +6,9 @@
   <title :text="$page.title.suffix(' · ').suffix($site.title)"></title>
   <meta name="description" content="$page.description">
   <link rel="stylesheet" href="$site.asset('css/notizine.css').link()">
+  <ctx alt="$site.page('posts').alternative('rss')" :if="$site.asset('notizine.json').ziggy().get('features').get('rss')">
+    <link rel="alternate" type="application/rss+xml" href="$ctx.alt.link()">
+  </ctx>
   <super>
 </head>
 <body id="body">
@@ -33,6 +36,9 @@
   </main>
   <footer id="footer">
     <a href="$site.index().link()" :text="$i18n.get('back_to_top')"></a>
+    <ctx alt="$site.page('posts').alternative('rss')" :if="$site.asset('notizine.json').ziggy().get('features').get('rss')">
+      <a href="$ctx.alt.link()" class="rss-link">RSS</a>
+    </ctx>
     <p>
       <span :text="$i18n.get('generated_by')"></span>
       <a href="https://zine-ssg.io">Zine</a>
