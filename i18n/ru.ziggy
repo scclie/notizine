@@ -1,5 +1,6 @@
 {
     "translation_notice": "Эта страница была автоматически переведена и может содержать неточности.",
+    "read_original": "Читать оригинал",
     "recents_title": "Недавние записи",
     "explorer_title": "Карта сайта",
     "search_title": "Поиск",
@@ -13,4 +14,5 @@
     "previous_page": "Назад",
     "next_page": "Вперёд",
     "theme_toggle": "Переключить тему",
+    "search_placeholder": "Поиск...",
 }

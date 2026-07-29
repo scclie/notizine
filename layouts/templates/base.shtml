@@ -11,11 +11,22 @@
 <body id="body">
   <header id="header">
     <a href="$site.index().link()" :text="$site.title"></a>
-    <nav :if="$page.locales().len.gt(1)">
-      <ctx :loop="$page.locales()">
-        <a href="$loop.it.link()" :text="$loop.it.site().localeCode()"></a>
-      </ctx>
-    </nav>
+    <ctx :if="$page.locales().len.gt(2)">
+      <nav>
+        <select onchange="location=this.value">
+          <ctx :loop="$page.locales()">
+            <option value="$loop.it.link()" :text="$loop.it.site().localeCode()"></option>
+          </ctx>
+        </select>
+      </nav>
+    </ctx>
+    <ctx :if="$page.locales().len.eq(2)">
+      <nav>
+        <ctx :loop="$page.locales()">
+          <a href="$loop.it.link()" :text="$loop.it.site().localeCode()"></a>
+        </ctx>
+      </nav>
+    </ctx>
   </header>
   <main id="content">
     <super>

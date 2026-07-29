@@ -1,5 +1,6 @@
 {
     "translation_notice": "This page was automatically translated and may contain inaccuracies.",
+    "read_original": "Read original",
     "recents_title": "Recent Notes",
     "explorer_title": "Site Explorer",
     "search_title": "Search",
@@ -13,4 +14,5 @@
     "previous_page": "Previous",
     "next_page": "Next",
     "theme_toggle": "Toggle theme",
+    "search_placeholder": "Search...",
 }

@@ -8,9 +8,14 @@
       <h1 :text="$page.title"></h1>
       <time :text="$page.date.format('2006-01-02')"></time>
     </header>
-    <aside :if="$page.custom.get?('auto_translated')">
-      <p :text="$i18n.get('translation_notice')"></p>
-    </aside>
+    <ctx :if="$page.custom.get?('auto_translated')">
+      <aside>
+        <p :text="$i18n.get('translation_notice')"></p>
+        <ctx :if="$page.custom.get?('original_path')">
+          <a :href="$if" :text="$i18n.get('read_original')"></a>
+        </ctx>
+      </aside>
+    </ctx>
     <div :html="$page.content()"></div>
     <ctx :if="$page.tags.len.gt(0)">
       <ctx :loop="$page.tags">
