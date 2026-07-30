@@ -1,0 +1,84 @@
+{
+  // ── Features ──  false = removed from output
+  "features": {
+    "recents": true,            // /recents/ – latest 50 posts
+    "explorer": true,           // /explorer/ – full site tree
+    "search": true,             // /search/ – search page
+    "darkmode": true,           // ☀/☾ toggle + prefers-color-scheme
+    "translation_notice": true, // "auto-translated" banner
+    "tags": true,               // /tags/ – tag listing + filter
+    "breadcrumbs": true,        // Home / Section / Page chain
+    "og_images": true,          // OpenGraph meta + twitter:card
+    "rss": false,               // RSS feed + discovery link + footer button
+    "inline_mode": true        // Inline CSS into <style> (no .css http request)
+  },
+  "language_primary": "ru",     // Source locale for translate/convert scripts
+
+  // ── Analytics & Comments ──
+  "analytics": "",              // Raw analytics script/URL. Empty = disabled.
+  "plausible_domain": "",       // Plausible domain (e.g. "example.com")
+  "comments": {},               // Reserved for self-hosted comments (v2)
+
+  // ── Slots (module system) ──
+  // Each zone has an ordered list of module paths.
+  // Built-in modules start with _   Static modules: modules/name.html
+  // Empty array = zone hidden. [] = nothing rendered.
+  // Each inner array = one flex row. Modules inside share the same line.
+  // :center or :right suffix to any module for alignment.
+  //   "_header:center"  →  centered title
+  //   "modules/badges.html:right"  →  right-aligned badges
+  //   "_footer_text:center"  →  centered footer text
+  "slots": {
+    "left":      [ ["modules/divider.html"], ["_recents:right"]],
+    "center_before":  [ ["_header", "_theme_toggle", "_spacer", "_lang_nav"] ],
+    "center_pre":     [ ["_breadcrumbs"] ],
+    "center_after":   [],
+    "right":     [],
+    "footer":    [ ["modules/badges.html:center"], ["_footer_text:center"] ]
+  },
+
+  // ── Layout ──
+  "layout": {
+    "columns": ["auto", "720px", "auto"],  // "hide" = hide, "auto" = show
+    "gap": "1.5rem"                       // Gap between columns
+  },
+
+  // ── Custom CSS ──
+  "custom_css": "",             // assets/custom.css – injected as <style>
+
+  // ── Social ──
+  "social": {
+    "github": "",               // GitHub username
+    "mastodon": ""              // Mastodon profile URL (adds rel="me")
+  },
+
+  // ── Fonts ──  CSS font-family values. Empty = system default.
+  "fonts": {
+    "heading": "",              // h1-h6, site title  –  "'Inter', sans-serif"
+    "body": "",                 // body text  –  "'Inter', sans-serif"
+    "code": ""                  // <code>, <pre>  –  "'JetBrains Mono', monospace"
+  },
+  "google_fonts": "",           // "Inter:wght@400;700" or "Fam1&family=Fam2"
+
+  // ── OG Image generation ──  scripts/generate-og-all.py
+  "og": {
+    "site_name": "notizine",    // Displayed on OG images
+    "font_source": "google",    // "google" | "local" | "" (Pillow default)
+    "font_family": "Open+Sans:wght@400;700",  // Google Fonts family
+    "font_path": "",            // Local .ttf path (when source = "local")
+    // Colors
+    "bg_top": "#2e3440",        // Gradient top (Nord0)
+    "bg_bottom": "#3b4252",     // Gradient bottom (Nord1)
+    "accent": "#5e81ac",        // Left accent bar (Nord10)
+    "text": "#eceff4",          // Title & description (Nord6)
+    "muted": "#b48ead",         // Date & site name (Nord15)
+    // Sizes
+    "title_size": 52,           // Title font (px)
+    "desc_size": 26,            // Description font (px)
+    "site_size": 22,            // Site name font (px)
+    "date_size": 24,            // Date font (px)
+    // Toggles
+    "show_date": true,          // Show publication date
+    "show_desc": true           // Show description text
+  }
+}

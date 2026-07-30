@@ -22,6 +22,7 @@ in
 pkgs.mkShell {
   buildInputs = [
     pkgs.nodejs
+    pkgs.python3Packages.pillow
     zine
   ];
 

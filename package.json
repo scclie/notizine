@@ -5,7 +5,9 @@
   "private": true,
   "scripts": {
     "dev": "zine",
-    "build": "zine release --force",
+    "build": "bash scripts/build.sh",
+    "build:fast": "zine release --force",
+    "build:purge": "python3 scripts/purge-css.py public/index.html --in-place",
     "preview": "zine release --force && npx serve public"
   }
 }
