@@ -1,9 +1,10 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, relative, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { default as generateOG } from './generate-og.mjs';
 
 const ROOT = process.cwd();
-const CACHE_DIR = join(ROOT, '.cache', 'modules');
+const CACHE_DIR = join(ROOT, 'assets', '.cache', 'modules');
 const CONFIG_PATH = join(ROOT, 'assets', 'notizine.ziggy');
 const MODULES_DIR = join(ROOT, 'modules');
 const I18N_DIR = join(ROOT, 'i18n');
@@ -150,19 +151,13 @@ function sanitizePath(link) {
 
 async function runGenerators(modules, siteData) {
   const results = {};
-  mkdirSync(join(ROOT, '.cache'), { recursive: true });
+  mkdirSync(CACHE_DIR, { recursive: true });
   for (const [name, mod] of Object.entries(modules)) {
     if (mod.type === 'static') {
       const htmlPath = join(mod.dir, 'template.html');
       const html = existsSync(htmlPath) ? readFileSync(htmlPath, 'utf-8') : '';
       results[name] = { per_page: false, pages: {} };
-      for (const page of siteData.pages) {
-        const outDir = join(CACHE_DIR, name);
-        mkdirSync(outDir, { recursive: true });
-        const outFile = join(outDir, sanitizePath(page.link) + '.html');
-        mkdirSync(dirname(outFile), { recursive: true });
-        writeFileSync(outFile, html);
-      }
+      writeFileSync(join(CACHE_DIR, name + '.html'), html);
     } else if (mod.type === 'dynamic') {
       const genPath = join(mod.dir, 'generator.mjs');
       if (!existsSync(genPath)) {
@@ -171,19 +166,11 @@ async function runGenerators(modules, siteData) {
       }
       const gen = await import(pathToFileURL(genPath).href);
       const output = await gen.default(siteData);
-      results[name] = { per_page: output.pages ? true : false, pages: {} };
-      const pageMap = output.pages || {};
-      if (output.html) {
-        for (const page of siteData.pages) {
-          pageMap[page.link] = output.html;
-        }
-      }
-      for (const [pageLink, html] of Object.entries(pageMap)) {
-        const outDir = join(CACHE_DIR, name);
-        mkdirSync(outDir, { recursive: true });
-        const outFile = join(outDir, sanitizePath(pageLink) + '.html');
-        mkdirSync(dirname(outFile), { recursive: true });
-        writeFileSync(outFile, html);
+      if (output.html !== undefined) {
+        results[name] = { per_page: false, pages: {} };
+        writeFileSync(join(CACHE_DIR, name + '.html'), output.html);
+      } else if (output.pages) {
+        results[name] = { per_page: true, pages: {} };
       }
     }
   }
@@ -208,7 +195,7 @@ function generatePerPageCSS(config, modules, siteData) {
   const customCSS = config.custom_css
     ? readFileSync(join(ROOT, 'assets', config.custom_css), 'utf-8') : '';
 
-  const cssDir = join(ROOT, '.cache', 'css');
+  const cssDir = join(ROOT, 'assets', '.cache', 'css');
   mkdirSync(cssDir, { recursive: true });
 
   for (const page of siteData.pages) {
@@ -239,7 +226,7 @@ function writeManifest(modules, siteData) {
       path: '.cache/modules/' + name,
     };
   }
-  writeFileSync(join(ROOT, '.cache', 'manifest.json'), JSON.stringify(manifest, null, 2));
+  writeFileSync(join(ROOT, 'assets', '.cache', 'manifest.json'), JSON.stringify(manifest, null, 2));
 }
 
 async function main() {
@@ -249,6 +236,8 @@ async function main() {
   const i18n = readI18n();
   const pages = scanPages(zineConfig);
   const siteData = { config, zineConfig, i18n, pages };
+
+  generateOG(siteData);
 
   const modules = discoverModules();
   console.log(`[generate] Found ${Object.keys(modules).length} modules`);

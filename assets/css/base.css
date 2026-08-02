@@ -541,10 +541,12 @@ nav a {
 
 .align-left { }
 
-.align-center {
+.center {
   margin: 0 auto;
 }
 
-.align-right {
+.right {
   margin-left: auto;
 }
+
+.left { }

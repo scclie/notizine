@@ -1,3 +1,7 @@
 public/
 *.swp
 .cache/
+assets/.cache/
+node_modules/
+.zine.ziggy-schema
+content/*/.smd.ziggy-schema

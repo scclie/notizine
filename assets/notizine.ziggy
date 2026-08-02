@@ -24,7 +24,7 @@
       ["_breadcrumbs"]
     ],
     "left": [
-      ["modules/divider"],
+      ["divider"],
       ["_recents"]
     ],
     "right": [],
@@ -32,7 +32,7 @@
       ["_prev_next"]
     ],
     "footer": [
-      ["modules/badges:center"],
+      ["badges:center"],
       ["_footer_text:center"],
       ["_back_to_top"]
     ]
