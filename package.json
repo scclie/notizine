@@ -1,13 +1,16 @@
 {
   "name": "notizine",
-  "version": "0.1.0",
-  "description": "Multilingual Zine-based generator for digital gardens and blogs",
+  "version": "0.2.0",
+  "description": "Multilingual modular SSG for digital gardens and blogs",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "zine",
-    "build": "bash scripts/build.sh",
-    "build:fast": "zine release --force",
-    "build:purge": "python3 scripts/purge-css.py public/index.html --in-place",
-    "preview": "zine release --force && npx serve public"
+    "build": "node scripts/build.mjs",
+    "preview": "npm run build && npx serve public"
+  },
+  "dependencies": {
+    "purgecss": "^7.0.0",
+    "glob": "^11.0.0"
   }
 }
