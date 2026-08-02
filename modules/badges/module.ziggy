@@ -1,0 +1,5 @@
+.{
+    .name = "badges",
+    .type = "static",
+    .description = "88x31 badge buttons",
+}

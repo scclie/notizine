@@ -1,0 +1,5 @@
+.{
+    .name = "_lang_nav",
+    .type = "dynamic",
+    .description = "Language switcher (inline links or dropdown)",
+}

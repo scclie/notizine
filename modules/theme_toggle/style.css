@@ -1,0 +1,15 @@
+.theme-toggle input {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+}
+.theme-toggle label {
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.1rem;
+  line-height: 1;
+  opacity: 0.5;
+}
+.theme-toggle label:hover { opacity: 0.8; }
+.theme-toggle input:checked + label { opacity: 1; }
+.theme-toggle label::after { content: "☀"; }
+.theme-toggle input:checked + label::after { content: "☾"; }

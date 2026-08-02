@@ -1,0 +1,5 @@
+.{
+    .name = "_header",
+    .type = "dynamic",
+    .description = "Site title link",
+}

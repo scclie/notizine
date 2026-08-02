@@ -1,0 +1,5 @@
+.{
+    .name = "_social",
+    .type = "dynamic",
+    .description = "GitHub + Mastodon links",
+}

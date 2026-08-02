@@ -1,0 +1,5 @@
+.{
+    .name = "_theme_toggle",
+    .type = "dynamic",
+    .description = "Dark mode checkbox toggle",
+}

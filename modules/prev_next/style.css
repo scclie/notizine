@@ -1,0 +1,15 @@
+.prev-next {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.prev-next a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.prev-next a:hover {
+  color: var(--accent2);
+}

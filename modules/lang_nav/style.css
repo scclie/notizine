@@ -1,0 +1,29 @@
+.lang-nav {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+.lang-nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+}
+.lang-nav a:hover {
+  background: var(--accent);
+  color: var(--nord0);
+}
+.lang-nav select {
+  font-size: 0.9rem;
+  padding: 0.15em 0.4em;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  outline: none;
+}
+.lang-nav select:hover,
+.lang-nav select:focus {
+  border-color: var(--accent);
+}

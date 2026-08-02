@@ -1,0 +1,5 @@
+.{
+    .name = "divider",
+    .type = "static",
+    .description = "Horizontal rule separator",
+}

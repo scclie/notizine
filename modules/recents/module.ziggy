@@ -1,0 +1,5 @@
+.{
+    .name = "_recents",
+    .type = "dynamic",
+    .description = "Recent posts list (last 5)",
+}

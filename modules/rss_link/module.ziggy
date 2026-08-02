@@ -1,0 +1,5 @@
+.{
+    .name = "_rss_link",
+    .type = "dynamic",
+    .description = "RSS feed button",
+}

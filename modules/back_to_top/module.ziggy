@@ -1,0 +1,5 @@
+.{
+    .name = "_back_to_top",
+    .type = "static",
+    .description = "Back to top link",
+}

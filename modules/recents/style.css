@@ -1,0 +1,30 @@
+.module-recents {
+  font-size: 0.9rem;
+}
+
+.module-recents h3 {
+  font-size: 1rem;
+  margin: 0 0 0.6rem;
+  color: var(--accent);
+}
+
+.recent-item {
+  margin: 0.4rem 0;
+  line-height: 1.4;
+}
+
+.recent-item a {
+  color: var(--text);
+  text-decoration: none;
+  display: block;
+}
+
+.recent-item a:hover {
+  color: var(--accent);
+}
+
+.recent-item time {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}

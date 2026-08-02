@@ -1,0 +1,13 @@
+.module-social {
+  display: flex;
+  gap: 0.8rem;
+}
+.social-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.social-link:hover {
+  color: var(--accent2);
+  text-decoration: underline;
+}

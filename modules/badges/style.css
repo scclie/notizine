@@ -1,0 +1,14 @@
+.module-badges {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.module-badges img {
+  image-rendering: pixelated;
+  width: 88px;
+  height: 31px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
