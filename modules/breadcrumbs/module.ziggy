@@ -1,0 +1,5 @@
+.{
+    .name = "_breadcrumbs",
+    .type = "dynamic",
+    .description = "Home / Section / Page breadcrumb chain",
+}
