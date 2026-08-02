@@ -1,0 +1,262 @@
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { join, dirname, relative, basename } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+const ROOT = process.cwd();
+const CACHE_DIR = join(ROOT, '.cache', 'modules');
+const CONFIG_PATH = join(ROOT, 'assets', 'notizine.ziggy');
+const MODULES_DIR = join(ROOT, 'modules');
+const I18N_DIR = join(ROOT, 'i18n');
+const CONTENT_DIR = join(ROOT, 'content');
+const ZINE_CONFIG_PATH = join(ROOT, 'zine.ziggy');
+
+function stripZiggyComments(raw) {
+  return raw
+    .replace(/\/\/.*$/gm, '')
+    .replace(/,(\s*[}\]])/g, '$1');
+}
+
+function readConfig() {
+  const raw = readFileSync(CONFIG_PATH, 'utf-8');
+  return JSON.parse(stripZiggyComments(raw));
+}
+
+function readZineConfig() {
+  const raw = readFileSync(ZINE_CONFIG_PATH, 'utf-8');
+  const hostMatch = raw.match(/\.host_url\s*=\s*"([^"]+)"/);
+  const locales = [];
+  const re = /\.code\s*=\s*"([^"]+)".*?\.name\s*=\s*"([^"]+)".*?\.site_title\s*=\s*"([^"]+)".*?\.content_dir_path\s*=\s*"([^"]+)"(?:\s*,\s*\.output_prefix_override\s*=\s*"([^"]*)")?/gs;
+  for (const m of raw.matchAll(re)) {
+    locales.push({
+      code: m[1],
+      name: m[2],
+      site_title: m[3],
+      content_dir_path: m[4],
+      output_prefix: m[5] !== undefined ? m[5] : null,
+    });
+  }
+  return { host_url: hostMatch?.[1] || '', locales };
+}
+
+function readI18n() {
+  const result = {};
+  const files = readdirSync(I18N_DIR).filter(f => f.endsWith('.ziggy'));
+  for (const file of files) {
+    const lang = file.replace('.ziggy', '');
+    const raw = readFileSync(join(I18N_DIR, file), 'utf-8');
+    result[lang] = JSON.parse(stripZiggyComments(raw));
+  }
+  return result;
+}
+
+function extractZiggyValue(fm, key) {
+  const re = new RegExp('\\.' + key + '\\s*=\\s*(?:"([^"]*)"|([^,\\n]+))');
+  const m = fm.match(re);
+  if (!m) return '';
+  return m[1] || (m[2] ? m[2].trim() : '');
+}
+
+function extractZiggyDate(fm, key) {
+  const raw = extractZiggyValue(fm, key);
+  const m = raw.match(/\.date\("([^"]+)"\)/);
+  return m ? m[1] : raw;
+}
+
+function extractZiggyArray(fm, key) {
+  const re = new RegExp('\\.' + key + '\\s*=\\s*\\[([^\\]]*)\\]');
+  const m = fm.match(re);
+  if (!m) return [];
+  return m[1].split(',').map(s => s.trim().replace(/"/g, '')).filter(Boolean);
+}
+
+function parseSMDFrontmatter(filePath, locale, parentSection) {
+  const raw = readFileSync(filePath, 'utf-8');
+  const fmMatch = raw.match(/^---\n([\s\S]*?)\n---/);
+  const fm = fmMatch ? fmMatch[1] : '';
+  const relPath = relative(join(CONTENT_DIR, locale.content_dir_path.replace('content/', '')), dirname(filePath));
+  const slug = basename(filePath, '.smd') === 'index'
+    ? relPath : join(relPath, basename(filePath, '.smd'));
+  const title = extractZiggyValue(fm, 'title');
+  const description = extractZiggyValue(fm, 'description') || '';
+  const date = extractZiggyDate(fm, 'date') || '';
+  const tags = extractZiggyArray(fm, 'tags');
+  const prefix = locale.output_prefix !== null ? locale.output_prefix : locale.code + '/';
+  let link = prefix + slug.replace(/\\/g, '/') + '/';
+  link = link.replace(/\/\/+/g, '/');
+  return { link, title, description, date, tags, isSection: false, locale: locale.code, parentSection, filePath };
+}
+
+function scanPages(zineConfig) {
+  const pages = [];
+  const walked = new Set();
+  for (const locale of zineConfig.locales) {
+    const dir = join(CONTENT_DIR, locale.content_dir_path.replace('content/', ''));
+    walkSMD(dir, locale, pages, walked);
+  }
+  return pages;
+}
+
+function walkSMD(dir, locale, pages, walked, parentSection = null) {
+  if (!existsSync(dir)) return;
+  const entries = readdirSync(dir);
+  for (const entry of entries) {
+    const full = join(dir, entry);
+    if (walked.has(full)) continue;
+    walked.add(full);
+    const stat = statSync(full);
+    if (stat.isDirectory()) {
+      const indexSmd = join(full, 'index.smd');
+      if (existsSync(indexSmd)) {
+        walked.add(indexSmd);
+        const page = parseSMDFrontmatter(indexSmd, locale, parentSection);
+        page.isSection = true;
+        page.subpages = [];
+        pages.push(page);
+        walkSMD(full, locale, pages, walked, page);
+      }
+    } else if (entry === 'index.smd') {
+      const page = parseSMDFrontmatter(full, locale, parentSection);
+      page.isSection = true;
+      page.subpages = [];
+      pages.push(page);
+    } else if (entry.endsWith('.smd')) {
+      const page = parseSMDFrontmatter(full, locale, parentSection);
+      if (parentSection) parentSection.subpages.push(page);
+      pages.push(page);
+    }
+  }
+}
+
+function discoverModules() {
+  const modules = {};
+  if (!existsSync(MODULES_DIR)) return modules;
+  const dirs = readdirSync(MODULES_DIR);
+  for (const dir of dirs) {
+    const full = join(MODULES_DIR, dir);
+    if (!statSync(full).isDirectory()) continue;
+    const manifestPath = join(full, 'module.ziggy');
+    if (!existsSync(manifestPath)) continue;
+    const raw = readFileSync(manifestPath, 'utf-8');
+    const name = extractZiggyValue(raw, 'name');
+    const type = extractZiggyValue(raw, 'type');
+    modules[name] = { name, type, dir: full };
+  }
+  return modules;
+}
+
+function sanitizePath(link) {
+  return link.replace(/\/+$/, '').replace(/^\//, '');
+}
+
+async function runGenerators(modules, siteData) {
+  const results = {};
+  mkdirSync(join(ROOT, '.cache'), { recursive: true });
+  for (const [name, mod] of Object.entries(modules)) {
+    if (mod.type === 'static') {
+      const htmlPath = join(mod.dir, 'template.html');
+      const html = existsSync(htmlPath) ? readFileSync(htmlPath, 'utf-8') : '';
+      results[name] = { per_page: false, pages: {} };
+      for (const page of siteData.pages) {
+        const outDir = join(CACHE_DIR, name);
+        mkdirSync(outDir, { recursive: true });
+        const outFile = join(outDir, sanitizePath(page.link) + '.html');
+        mkdirSync(dirname(outFile), { recursive: true });
+        writeFileSync(outFile, html);
+      }
+    } else if (mod.type === 'dynamic') {
+      const genPath = join(mod.dir, 'generator.mjs');
+      if (!existsSync(genPath)) {
+        console.warn(`[generate] module "${name}" has type=dynamic but no generator.mjs`);
+        continue;
+      }
+      const gen = await import(pathToFileURL(genPath).href);
+      const output = await gen.default(siteData);
+      results[name] = { per_page: output.pages ? true : false, pages: {} };
+      const pageMap = output.pages || {};
+      if (output.html) {
+        for (const page of siteData.pages) {
+          pageMap[page.link] = output.html;
+        }
+      }
+      for (const [pageLink, html] of Object.entries(pageMap)) {
+        const outDir = join(CACHE_DIR, name);
+        mkdirSync(outDir, { recursive: true });
+        const outFile = join(outDir, sanitizePath(pageLink) + '.html');
+        mkdirSync(dirname(outFile), { recursive: true });
+        writeFileSync(outFile, html);
+      }
+    }
+  }
+  return results;
+}
+
+function getAllSlotNames(slots) {
+  const names = new Set();
+  for (const rows of Object.values(slots)) {
+    for (const row of rows) {
+      for (const item of row) {
+        names.add(item.split(':')[0]);
+      }
+    }
+  }
+  return [...names];
+}
+
+function generatePerPageCSS(config, modules, siteData) {
+  const baseCSS = readFileSync(join(ROOT, 'assets', 'css', 'base.css'), 'utf-8');
+  const codeCSS = readFileSync(join(ROOT, 'assets', 'css', 'code.css'), 'utf-8');
+  const customCSS = config.custom_css
+    ? readFileSync(join(ROOT, 'assets', config.custom_css), 'utf-8') : '';
+
+  const cssDir = join(ROOT, '.cache', 'css');
+  mkdirSync(cssDir, { recursive: true });
+
+  for (const page of siteData.pages) {
+    let css = baseCSS + '\n' + codeCSS;
+    for (const slotName of getAllSlotNames(config.slots)) {
+      const mod = modules[slotName];
+      if (!mod) continue;
+      const stylePath = join(mod.dir, 'style.css');
+      if (existsSync(stylePath)) {
+        css += '\n' + readFileSync(stylePath, 'utf-8');
+      }
+    }
+    css += '\n' + customCSS;
+    const outFile = join(cssDir, sanitizePath(page.link) + '.css');
+    mkdirSync(dirname(outFile), { recursive: true });
+    writeFileSync(outFile, css);
+  }
+}
+
+function writeManifest(modules, siteData) {
+  const manifest = {
+    modules: {},
+    pages: siteData.pages.map(p => p.link),
+  };
+  for (const [name] of Object.entries(modules)) {
+    manifest.modules[name] = {
+      cached: true,
+      path: '.cache/modules/' + name,
+    };
+  }
+  writeFileSync(join(ROOT, '.cache', 'manifest.json'), JSON.stringify(manifest, null, 2));
+}
+
+async function main() {
+  console.log('[generate] Starting pre-generation...');
+  const config = readConfig();
+  const zineConfig = readZineConfig();
+  const i18n = readI18n();
+  const pages = scanPages(zineConfig);
+  const siteData = { config, zineConfig, i18n, pages };
+
+  const modules = discoverModules();
+  console.log(`[generate] Found ${Object.keys(modules).length} modules`);
+
+  await runGenerators(modules, siteData);
+  generatePerPageCSS(config, modules, siteData);
+  writeManifest(modules, siteData);
+  console.log('[generate] Done.');
+}
+
+main().catch(err => { console.error(err); process.exit(1); });
