@@ -1,72 +1,106 @@
 {
+  // ── Features ──  Toggle site features on/off. false = removed from output.
   "features": {
-    "recents": true,
-    "explorer": true,
-    "search": true,
-    "darkmode": true,
-    "translation_notice": true,
-    "tags": true,
-    "breadcrumbs": true,
-    "og_images": true,
-    "rss": false,
-    "inline_mode": true
+    "recents": true,            // /recents/ – latest posts list
+    "explorer": true,           // /explorer/ – full site tree
+    "search": true,             // /search/ – client-side search page
+    "darkmode": true,           // ☀/☾ theme toggle + prefers-color-scheme
+    "translation_notice": true, // "auto-translated" banner on non-primary locale pages
+    "tags": true,               // /tags/ – tag listing + JS filter
+    "breadcrumbs": true,        // Home / Section / Page breadcrumb chain
+    "og_images": true,          // 1200×630 PNG social preview images
+    "rss": false,               // RSS feed + discovery link + footer button
+    "inline_mode": true         // Inline CSS into <style> (zero external CSS requests)
   },
-  "language_primary": "ru",
-  "analytics": "",
-  "plausible_domain": "",
-  "comments": {},
+  "language_primary": "ru",     // Primary locale for i18n defaults
+
+  // ── Analytics & Comments ──
+  "analytics": "",              // Raw analytics script/URL. Empty = disabled.
+  "plausible_domain": "",       // Plausible domain (e.g. "example.com")
+  "comments": {},               // Reserved for self-hosted comments (v3)
+
+  // ── Module settings ──  Per-module customization.
+  "modules": {
+    "recents": {
+      "count": 5                // Number of recent posts to show
+    }
+  },
+
+  // ── Slots (module system) ──
+  // Each zone is an ordered list of module rows.
+  // Built-in modules start with _   Static modules: just the name (e.g. "divider")
+  // Each inner array = one flex row. Modules in the same row share one line.
+  // :center or :right suffix aligns the module (left is default).
+  //   "_header:center"  →  centered title
+  //   "badges:center"    →  centered badges
+  //   "_footer_text:right"  →  right-aligned footer text
+  // Empty array = zone hidden.
   "slots": {
     "header": [
-      ["_header"],
-      ["_theme_toggle", "_spacer", "_lang_nav"]
+      ["_header", "_theme_toggle", "_spacer", "_lang_nav"]
     ],
     "before_main": [
       ["_breadcrumbs"]
     ],
     "left": [
       ["divider"],
-      ["_recents"]
+      ["_recents"],
+      ["divider"],
+      ["_explorer"]
     ],
     "right": [],
-    "after_main": [
-      ["_prev_next"]
-    ],
+    "after_main": [],
     "footer": [
       ["badges:center"],
       ["_footer_text:center"],
-      ["_back_to_top"]
+      ["_back_to_top:center"]
     ]
   },
+
+  // ── Layout ──
   "layout": {
+    // Three-column CSS Grid.
+    // Column 1 = left sidebar, 2 = center (main content), 3 = right sidebar.
+    // "auto" = show, "hide" = hidden, "200px" = fixed width.
     "columns": ["auto", "720px", "auto"],
-    "gap": "1.5rem"
+    "gap": "1.5rem"              // Gap between grid columns
   },
-  "custom_css": "",
+
+  // ── Custom CSS ──
+  "custom_css": "",             // Path to extra CSS file in assets/ (e.g. "css/custom.css")
+
+  // ── Social ──
   "social": {
-    "github": "",
-    "mastodon": ""
+    "github": "",               // GitHub username → renders link to github.com/<username>
+    "mastodon": ""              // Mastodon profile URL → adds rel="me"
   },
+
+  // ── Fonts ──  CSS font-family values. Empty = system default.
   "fonts": {
-    "heading": "",
-    "body": "",
-    "code": ""
+    "heading": "",              // h1-h6, site title  –  e.g. "'Inter', sans-serif"
+    "body": "",                 // body text  –  e.g. "'Inter', sans-serif"
+    "code": ""                  // <code>, <pre>  –  e.g. "'JetBrains Mono', monospace"
   },
-  "google_fonts": "",
+  "google_fonts": "",           // Google Fonts query: "Inter:wght@400;700"
+
+  // ── OG Image generation ──  Generate 1200×630 PNG for social previews.
   "og": {
-    "site_name": "notizine",
-    "font_source": "google",
-    "font_family": "Open+Sans:wght@400;700",
-    "font_path": "",
-    "bg_top": "#2e3440",
-    "bg_bottom": "#3b4252",
-    "accent": "#5e81ac",
-    "text": "#eceff4",
-    "muted": "#b48ead",
-    "title_size": 52,
-    "desc_size": 26,
-    "site_size": 22,
-    "date_size": 24,
-    "show_date": true,
-    "show_desc": true
+    "site_name": "notizine",    // Displayed at top-left of OG image
+    "font_family": "system-ui, sans-serif",  // Font family for OG image text
+    // Colors — Nord palette defaults
+    "bg_top": "#2e3440",        // Gradient top
+    "bg_bottom": "#3b4252",     // Gradient bottom (or use background_image below)
+    "accent": "#5e81ac",        // Left accent bar
+    "text": "#eceff4",          // Title & description text
+    "muted": "#b48ead",         // Date & site name text
+    // Font sizes (px)
+    "title_size": 52,           // Page title
+    "desc_size": 26,            // Page description
+    "site_size": 22,            // Site name
+    "date_size": 24,            // Publication date
+    // Toggles
+    "show_date": true,          // Show publication date
+    "show_desc": true,          // Show description text
+    "background_image": ""      // Optional: image path/URL (overrides gradient)
   }
 }

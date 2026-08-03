@@ -1,5 +1,5 @@
 .{
     .name = "_lang_nav",
-    .type = "dynamic",
+    .type = "builtin",
     .description = "Language switcher (inline links or dropdown)",
 }

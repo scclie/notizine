@@ -1,5 +1,5 @@
 .{
     .name = "_header",
-    .type = "dynamic",
+    .type = "builtin",
     .description = "Site title link",
 }

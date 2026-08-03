@@ -6,7 +6,29 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
   <title :text="$page.title.suffix(' · ').suffix($site.title)"></title>
   <meta name="description" content="$page.description">
-  <link rel="stylesheet" href="$site.asset('css/base.css').link()">
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('inline_mode')">
+    <style :html="$site.asset('.cache/all.css').bytes()"></style>
+  </ctx>
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('inline_mode').not()">
+    <link rel="stylesheet" href="$site.asset('css/base.css').link()">
+  </ctx>
+  <script :html="$site.asset('js/theme.js').bytes()"></script>
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('fonts').get('body').len().gt(0)">
+    <style :html="$site.asset('notizine.ziggy').ziggy().get('fonts').get('body').prefix(':root{--font-body:').suffix('}')"></style>
+  </ctx>
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('fonts').get('heading').len().gt(0)">
+    <style :html="$site.asset('notizine.ziggy').ziggy().get('fonts').get('heading').prefix(':root{--font-heading:').suffix('}')"></style>
+  </ctx>
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('fonts').get('code').len().gt(0)">
+    <style :html="$site.asset('notizine.ziggy').ziggy().get('fonts').get('code').prefix(':root{--font-code:').suffix('}')"></style>
+  </ctx>
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('google_fonts').len().gt(0)">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="$site.asset('notizine.ziggy').ziggy().get('google_fonts').prefix('https://fonts.googleapis.com/css2?family=').suffix('&display=swap')">
+  </ctx>
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('custom_css').len().gt(0)">
+    <style :html="$site.asset($site.asset('notizine.ziggy').ziggy().get('custom_css')).bytes()"></style>
+  </ctx>
   <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('og_images')">
     <meta property="og:title" content="$page.title">
     <meta property="og:description" content="$page.description">
@@ -24,166 +46,52 @@
   <div class="layout">
     <aside class="zone zone-left" id="zone-left">
       <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('left')">
-        <div class="slot-row">
-          <ctx :loop="$loop.it">
-            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).not()">
-              <ctx name="$loop.it.splitN(':',0)">
-                <ctx align="$loop.it.endsWith(':right').then('right', $loop.it.endsWith(':center').then('center', 'left'))">
-                  <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
-                </ctx>
-              </ctx>
-            </ctx>
-            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
-              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
-                <ctx :if="$page.isSection().not()">
-                  <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
-                </ctx>
-              </ctx>
-            </ctx>
-            <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
-              <ctx :if="$page.isSection().not()">
-                <ctx :if="$page.hasPrev().or($page.hasNext())">
-                  <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
-                </ctx>
+        <div class="slot-row"><ctx :loop="$loop.it">
+          <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).or($loop.it.splitN(':',0).eql('_header')).or($loop.it.splitN(':',0).eql('_footer_text')).or($loop.it.splitN(':',0).eql('_recents')).or($loop.it.splitN(':',0).eql('_lang_nav')).or($loop.it.splitN(':',0).eql('_theme_toggle')).or($loop.it.splitN(':',0).eql('_spacer')).or($loop.it.splitN(':',0).eql('_explorer')).not()">
+            <ctx name="$loop.it.splitN(':',0)">
+              <ctx align="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
               </ctx>
             </ctx>
           </ctx>
-        </div>
-      </ctx>
-    </aside>
-    <div class="zone zone-center" id="zone-center">
-      <header id="header">
-        <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('header')">
-          <div class="slot-row">
-            <ctx :loop="$loop.it">
-              <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).not()">
-                <ctx name="$loop.it.splitN(':',0)">
-                  <ctx align="$loop.it.endsWith(':right').then('right', $loop.it.endsWith(':center').then('center', 'left'))">
-                    <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
+          <ctx :if="$loop.it.splitN(':',0).eql('_header')">
+            <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+              <div class="$ctx.a">            <a href="$site.index().link()" class="site-title" :text="$site.title"></a>              </div></ctx>
+          </ctx>
+          <ctx :if="$loop.it.splitN(':',0).eql('_footer_text')">
+            <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))"><div class="$ctx.a"><p class="footer-text"><span :text="$i18n.get('generated_by')"></span> <a href="https://zine-ssg.io">Zine</a> <span :text="$i18n.get('with')"></span> <a href="https://notizine.sccl.cc">notizine</a></p></div></ctx>
+          </ctx>
+          <ctx :if="$loop.it.splitN(':',0).eql('_recents')">
+            <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+              <div class="$ctx.a">            <ctx cnt="$site.asset('notizine.ziggy').ziggy().get('modules').get('recents').get('count')"><div class="module module-recents"><a href="$site.page('recents').link()"><h3 :text="$i18n.get('recents_title')"></h3></a><ctx :loop="$site.index().leaves($ctx.cnt)"><ctx :if="$loop.it.link().endsWith('tags/').or($loop.it.link().endsWith('search/')).or($loop.it.link().endsWith('recents/')).or($loop.it.link().endsWith('explorer/')).or($loop.it.link().endsWith('posts/')).not()"><div class="recent-item"><a href="$loop.it.link()" :text="$loop.it.title"></a><time :text="$loop.it.date.format('2006-01-02')"></time></div></ctx></ctx><a href="$site.page('recents').link()" class="see-more" :text="$i18n.get('see_more')"></a></div></ctx>              </div></ctx>
+          </ctx>
+          <ctx :if="$loop.it.splitN(':',0).eql('_lang_nav')">
+            <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+              <div class="$ctx.a">            <ctx :if="$page.locales().len.gt(2)"><nav class="lang-nav"><select onchange="location=this.value"><ctx :loop="$page.locales()"><option value="$loop.it.link()" :text="$loop.it.site().localeCode()"></option></ctx></select></nav></ctx>
+            <ctx :if="$page.locales().len.eq(2)"><nav class="lang-nav"><ctx :loop="$page.locales()"><a href="$loop.it.link()" :text="$loop.it.site().localeCode()"></a></ctx></nav></ctx>              </div></ctx>
+          </ctx>
+          <ctx :if="$loop.it.splitN(':',0).eql('_theme_toggle')">
+            <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+              <div class="$ctx.a">            <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('darkmode')"><div class="theme-toggle"><input type="checkbox" id="theme-dark" onchange="localStorage.setItem('notizine-theme',this.checked?'dark':'light');document.documentElement.setAttribute('data-theme',this.checked?'dark':'')"><label for="theme-dark" title="Toggle theme"></label></div></ctx>              </div></ctx>
+          </ctx>
+          <ctx :if="$loop.it.splitN(':',0).eql('_spacer')">
+            <span class="flex-spacer"></span>
+          </ctx>
+          <ctx :if="$loop.it.splitN(':',0).eql('_explorer')">
+            <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('explorer')">
+              <ul class="explorer-tree">
+                <li :loop="$site.index().subpages()">
+<ctx :if="$loop.it.link().endsWith('tags/').or($loop.it.link().endsWith('search/')).or($loop.it.link().endsWith('recents/')).or($loop.it.link().endsWith('explorer/')).not()">
+                  <ctx :if="$loop.it.isSection()">
+                    <details><summary><a href="$loop.it.link()" :text="$loop.it.title"></a></summary>
+                      <ctx :if="$loop.it.leaves().len.gt(0)"><ul><li :loop="$loop.it.leaves()"><a href="$loop.it.link()" :text="$loop.it.title"></a></li></ul></ctx>
+                    </details>
                   </ctx>
+                  <ctx :if="$loop.it.isSection().not()"><a href="$loop.it.link()" :text="$loop.it.title"></a></ctx>
                 </ctx>
-              </ctx>
-              <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
-                <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
-                  <ctx :if="$page.isSection().not()">
-                    <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
-                  </ctx>
-                </ctx>
-              </ctx>
-              <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
-                <ctx :if="$page.isSection().not()">
-                  <ctx :if="$page.hasPrev().or($page.hasNext())">
-                    <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
-                  </ctx>
-                </ctx>
-              </ctx>
-            </ctx>
-          </div>
-        </ctx>
-      </header>
-      <ctx :if="$site.asset('notizine.ziggy').ziggy().get('slots').get('before_main').len.gt(0)">
-        <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('before_main')">
-          <div class="slot-row">
-            <ctx :loop="$loop.it">
-              <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).not()">
-                <ctx name="$loop.it.splitN(':',0)">
-                  <ctx align="$loop.it.endsWith(':right').then('right', $loop.it.endsWith(':center').then('center', 'left'))">
-                    <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
-                  </ctx>
-                </ctx>
-              </ctx>
-              <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
-                <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
-                  <ctx :if="$page.isSection().not()">
-                    <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
-                  </ctx>
-                </ctx>
-              </ctx>
-              <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
-                <ctx :if="$page.isSection().not()">
-                  <ctx :if="$page.hasPrev().or($page.hasNext())">
-                    <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
-                  </ctx>
-                </ctx>
-              </ctx>
-            </ctx>
-          </div>
-        </ctx>
-      </ctx>
-      <main id="content">
-        <super>
-      </main>
-      <ctx :if="$site.asset('notizine.ziggy').ziggy().get('slots').get('after_main').len.gt(0)">
-        <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('after_main')">
-          <div class="slot-row">
-            <ctx :loop="$loop.it">
-              <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).not()">
-                <ctx name="$loop.it.splitN(':',0)">
-                  <ctx align="$loop.it.endsWith(':right').then('right', $loop.it.endsWith(':center').then('center', 'left'))">
-                    <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
-                  </ctx>
-                </ctx>
-              </ctx>
-              <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
-                <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
-                  <ctx :if="$page.isSection().not()">
-                    <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
-                  </ctx>
-                </ctx>
-              </ctx>
-              <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
-                <ctx :if="$page.isSection().not()">
-                  <ctx :if="$page.hasPrev().or($page.hasNext())">
-                    <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
-                  </ctx>
-                </ctx>
-              </ctx>
-            </ctx>
-          </div>
-        </ctx>
-      </ctx>
-    </div>
-    <ctx :if="$site.asset('notizine.ziggy').ziggy().get('slots').get('right').len.gt(0)">
-      <aside class="zone zone-right" id="zone-right">
-        <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('right')">
-          <div class="slot-row">
-            <ctx :loop="$loop.it">
-              <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).not()">
-                <ctx name="$loop.it.splitN(':',0)">
-                  <ctx align="$loop.it.endsWith(':right').then('right', $loop.it.endsWith(':center').then('center', 'left'))">
-                    <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
-                  </ctx>
-                </ctx>
-              </ctx>
-              <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
-                <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
-                  <ctx :if="$page.isSection().not()">
-                    <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
-                  </ctx>
-                </ctx>
-              </ctx>
-              <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
-                <ctx :if="$page.isSection().not()">
-                  <ctx :if="$page.hasPrev().or($page.hasNext())">
-                    <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
-                  </ctx>
-                </ctx>
-              </ctx>
-            </ctx>
-          </div>
-        </ctx>
-      </aside>
-    </ctx>
-  </div>
-  <footer id="footer">
-    <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('footer')">
-      <div class="slot-row">
-        <ctx :loop="$loop.it">
-          <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).not()">
-            <ctx name="$loop.it.splitN(':',0)">
-              <ctx align="$loop.it.endsWith(':right').then('right', $loop.it.endsWith(':center').then('center', 'left'))">
-                <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
-              </ctx>
+
+                </li>
+              </ul>
             </ctx>
           </ctx>
           <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
@@ -200,8 +108,350 @@
               </ctx>
             </ctx>
           </ctx>
+        </ctx></div>
+      </ctx>
+    </aside>
+    <div class="zone zone-center" id="zone-center">
+      <header id="header">
+        <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('header')">
+          <div class="slot-row"><ctx :loop="$loop.it">
+            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).or($loop.it.splitN(':',0).eql('_header')).or($loop.it.splitN(':',0).eql('_footer_text')).or($loop.it.splitN(':',0).eql('_recents')).or($loop.it.splitN(':',0).eql('_lang_nav')).or($loop.it.splitN(':',0).eql('_theme_toggle')).or($loop.it.splitN(':',0).eql('_spacer')).or($loop.it.splitN(':',0).eql('_explorer')).not()">
+              <ctx name="$loop.it.splitN(':',0)">
+                <ctx align="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                  <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
+                </ctx>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_header')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <a href="$site.index().link()" class="site-title" :text="$site.title"></a>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_footer_text')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))"><div class="$ctx.a"><p class="footer-text"><span :text="$i18n.get('generated_by')"></span> <a href="https://zine-ssg.io">Zine</a> <span :text="$i18n.get('with')"></span> <a href="https://notizine.sccl.cc">notizine</a></p></div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_recents')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <div class="module module-recents"><a href="$site.page('recents').link()"><h3 :text="$i18n.get('recents_title')"></h3></a><ctx :loop="$site.index().leaves(5)"><div class="recent-item"><a href="$loop.it.link()" :text="$loop.it.title"></a><time :text="$loop.it.date.format('2006-01-02')"></time></div></ctx></div>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_lang_nav')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <ctx :if="$page.locales().len.gt(2)"><nav class="lang-nav"><select onchange="location=this.value"><ctx :loop="$page.locales()"><option value="$loop.it.link()" :text="$loop.it.site().localeCode()"></option></ctx></select></nav></ctx>
+              <ctx :if="$page.locales().len.eq(2)"><nav class="lang-nav"><ctx :loop="$page.locales()"><a href="$loop.it.link()" :text="$loop.it.site().localeCode()"></a></ctx></nav></ctx>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_theme_toggle')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('darkmode')"><div class="theme-toggle"><input type="checkbox" id="theme-dark" onchange="localStorage.setItem('notizine-theme',this.checked?'dark':'light');document.documentElement.setAttribute('data-theme',this.checked?'dark':'')"><label for="theme-dark" title="Toggle theme"></label></div></ctx>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_spacer')">
+              <span class="flex-spacer"></span>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_explorer')">
+              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('explorer')">
+                <ul class="explorer-tree">
+                  <li :loop="$site.index().subpages()">
+<ctx :if="$loop.it.link().endsWith('tags/').or($loop.it.link().endsWith('search/')).or($loop.it.link().endsWith('recents/')).or($loop.it.link().endsWith('explorer/')).not()">
+                    <ctx :if="$loop.it.isSection()">
+                      <details><summary><a href="$loop.it.link()" :text="$loop.it.title"></a></summary>
+                        <ctx :if="$loop.it.leaves().len.gt(0)"><ul><li :loop="$loop.it.leaves()"><a href="$loop.it.link()" :text="$loop.it.title"></a></li></ul></ctx>
+                      </details>
+                    </ctx>
+                    <ctx :if="$loop.it.isSection().not()"><a href="$loop.it.link()" :text="$loop.it.title"></a></ctx>
+                  </ctx>
+
+                  </li>
+                </ul>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
+              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
+                <ctx :if="$page.isSection().not()">
+                  <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
+                </ctx>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
+              <ctx :if="$page.isSection().not()">
+                <ctx :if="$page.hasPrev().or($page.hasNext())">
+                  <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
+                </ctx>
+              </ctx>
+            </ctx>
+          </ctx></div>
         </ctx>
-      </div>
+      </header>
+      <ctx :if="$site.asset('notizine.ziggy').ziggy().get('slots').get('before_main').len.gt(0)">
+        <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('before_main')">
+          <div class="slot-row"><ctx :loop="$loop.it">
+            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).or($loop.it.splitN(':',0).eql('_header')).or($loop.it.splitN(':',0).eql('_footer_text')).or($loop.it.splitN(':',0).eql('_recents')).or($loop.it.splitN(':',0).eql('_lang_nav')).or($loop.it.splitN(':',0).eql('_theme_toggle')).or($loop.it.splitN(':',0).eql('_spacer')).or($loop.it.splitN(':',0).eql('_explorer')).not()">
+              <ctx name="$loop.it.splitN(':',0)">
+                <ctx align="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                  <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
+                </ctx>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_header')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <a href="$site.index().link()" class="site-title" :text="$site.title"></a>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_footer_text')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))"><div class="$ctx.a"><p class="footer-text"><span :text="$i18n.get('generated_by')"></span> <a href="https://zine-ssg.io">Zine</a> <span :text="$i18n.get('with')"></span> <a href="https://notizine.sccl.cc">notizine</a></p></div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_recents')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <div class="module module-recents"><a href="$site.page('recents').link()"><h3 :text="$i18n.get('recents_title')"></h3></a><ctx :loop="$site.index().leaves(5)"><div class="recent-item"><a href="$loop.it.link()" :text="$loop.it.title"></a><time :text="$loop.it.date.format('2006-01-02')"></time></div></ctx></div>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_lang_nav')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <ctx :if="$page.locales().len.gt(2)"><nav class="lang-nav"><select onchange="location=this.value"><ctx :loop="$page.locales()"><option value="$loop.it.link()" :text="$loop.it.site().localeCode()"></option></ctx></select></nav></ctx>
+              <ctx :if="$page.locales().len.eq(2)"><nav class="lang-nav"><ctx :loop="$page.locales()"><a href="$loop.it.link()" :text="$loop.it.site().localeCode()"></a></ctx></nav></ctx>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_theme_toggle')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('darkmode')"><div class="theme-toggle"><input type="checkbox" id="theme-dark" onchange="localStorage.setItem('notizine-theme',this.checked?'dark':'light');document.documentElement.setAttribute('data-theme',this.checked?'dark':'')"><label for="theme-dark" title="Toggle theme"></label></div></ctx>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_spacer')">
+              <span class="flex-spacer"></span>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_explorer')">
+              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('explorer')">
+                <ul class="explorer-tree">
+                  <li :loop="$site.index().subpages()">
+<ctx :if="$loop.it.link().endsWith('tags/').or($loop.it.link().endsWith('search/')).or($loop.it.link().endsWith('recents/')).or($loop.it.link().endsWith('explorer/')).not()">
+                    <ctx :if="$loop.it.isSection()">
+                      <details><summary><a href="$loop.it.link()" :text="$loop.it.title"></a></summary>
+                        <ctx :if="$loop.it.leaves().len.gt(0)"><ul><li :loop="$loop.it.leaves()"><a href="$loop.it.link()" :text="$loop.it.title"></a></li></ul></ctx>
+                      </details>
+                    </ctx>
+                    <ctx :if="$loop.it.isSection().not()"><a href="$loop.it.link()" :text="$loop.it.title"></a></ctx>
+                  </ctx>
+
+                  </li>
+                </ul>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
+              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
+                <ctx :if="$page.isSection().not()">
+                  <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
+                </ctx>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
+              <ctx :if="$page.isSection().not()">
+                <ctx :if="$page.hasPrev().or($page.hasNext())">
+                  <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
+                </ctx>
+              </ctx>
+            </ctx>
+          </ctx></div>
+        </ctx>
+      </ctx>
+      <main id="content">
+        <super>
+      </main>
+      <ctx :if="$site.asset('notizine.ziggy').ziggy().get('slots').get('after_main').len.gt(0)">
+        <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('after_main')">
+          <div class="slot-row"><ctx :loop="$loop.it">
+            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).or($loop.it.splitN(':',0).eql('_header')).or($loop.it.splitN(':',0).eql('_footer_text')).or($loop.it.splitN(':',0).eql('_recents')).or($loop.it.splitN(':',0).eql('_lang_nav')).or($loop.it.splitN(':',0).eql('_theme_toggle')).or($loop.it.splitN(':',0).eql('_spacer')).or($loop.it.splitN(':',0).eql('_explorer')).not()">
+              <ctx name="$loop.it.splitN(':',0)">
+                <ctx align="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                  <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
+                </ctx>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_header')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <a href="$site.index().link()" class="site-title" :text="$site.title"></a>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_footer_text')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))"><div class="$ctx.a"><p class="footer-text"><span :text="$i18n.get('generated_by')"></span> <a href="https://zine-ssg.io">Zine</a> <span :text="$i18n.get('with')"></span> <a href="https://notizine.sccl.cc">notizine</a></p></div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_recents')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <div class="module module-recents"><a href="$site.page('recents').link()"><h3 :text="$i18n.get('recents_title')"></h3></a><ctx :loop="$site.index().leaves(5)"><div class="recent-item"><a href="$loop.it.link()" :text="$loop.it.title"></a><time :text="$loop.it.date.format('2006-01-02')"></time></div></ctx></div>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_lang_nav')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <ctx :if="$page.locales().len.gt(2)"><nav class="lang-nav"><select onchange="location=this.value"><ctx :loop="$page.locales()"><option value="$loop.it.link()" :text="$loop.it.site().localeCode()"></option></ctx></select></nav></ctx>
+              <ctx :if="$page.locales().len.eq(2)"><nav class="lang-nav"><ctx :loop="$page.locales()"><a href="$loop.it.link()" :text="$loop.it.site().localeCode()"></a></ctx></nav></ctx>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_theme_toggle')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('darkmode')"><div class="theme-toggle"><input type="checkbox" id="theme-dark" onchange="localStorage.setItem('notizine-theme',this.checked?'dark':'light');document.documentElement.setAttribute('data-theme',this.checked?'dark':'')"><label for="theme-dark" title="Toggle theme"></label></div></ctx>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_spacer')">
+              <span class="flex-spacer"></span>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_explorer')">
+              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('explorer')">
+                <ul class="explorer-tree">
+                  <li :loop="$site.index().subpages()">
+<ctx :if="$loop.it.link().endsWith('tags/').or($loop.it.link().endsWith('search/')).or($loop.it.link().endsWith('recents/')).or($loop.it.link().endsWith('explorer/')).not()">
+                    <ctx :if="$loop.it.isSection()">
+                      <details><summary><a href="$loop.it.link()" :text="$loop.it.title"></a></summary>
+                        <ctx :if="$loop.it.leaves().len.gt(0)"><ul><li :loop="$loop.it.leaves()"><a href="$loop.it.link()" :text="$loop.it.title"></a></li></ul></ctx>
+                      </details>
+                    </ctx>
+                    <ctx :if="$loop.it.isSection().not()"><a href="$loop.it.link()" :text="$loop.it.title"></a></ctx>
+                  </ctx>
+
+                  </li>
+                </ul>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
+              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
+                <ctx :if="$page.isSection().not()">
+                  <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
+                </ctx>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
+              <ctx :if="$page.isSection().not()">
+                <ctx :if="$page.hasPrev().or($page.hasNext())">
+                  <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
+                </ctx>
+              </ctx>
+            </ctx>
+          </ctx></div>
+        </ctx>
+      </ctx>
+    </div>
+    <ctx :if="$site.asset('notizine.ziggy').ziggy().get('slots').get('right').len.gt(0)">
+      <aside class="zone zone-right" id="zone-right">
+        <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('right')">
+          <div class="slot-row"><ctx :loop="$loop.it">
+            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).or($loop.it.splitN(':',0).eql('_header')).or($loop.it.splitN(':',0).eql('_footer_text')).or($loop.it.splitN(':',0).eql('_recents')).or($loop.it.splitN(':',0).eql('_lang_nav')).or($loop.it.splitN(':',0).eql('_theme_toggle')).or($loop.it.splitN(':',0).eql('_spacer')).or($loop.it.splitN(':',0).eql('_explorer')).not()">
+              <ctx name="$loop.it.splitN(':',0)">
+                <ctx align="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                  <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
+                </ctx>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_header')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <a href="$site.index().link()" class="site-title" :text="$site.title"></a>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_footer_text')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))"><div class="$ctx.a"><p class="footer-text"><span :text="$i18n.get('generated_by')"></span> <a href="https://zine-ssg.io">Zine</a> <span :text="$i18n.get('with')"></span> <a href="https://notizine.sccl.cc">notizine</a></p></div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_recents')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <div class="module module-recents"><a href="$site.page('recents').link()"><h3 :text="$i18n.get('recents_title')"></h3></a><ctx :loop="$site.index().leaves(5)"><div class="recent-item"><a href="$loop.it.link()" :text="$loop.it.title"></a><time :text="$loop.it.date.format('2006-01-02')"></time></div></ctx></div>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_lang_nav')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <ctx :if="$page.locales().len.gt(2)"><nav class="lang-nav"><select onchange="location=this.value"><ctx :loop="$page.locales()"><option value="$loop.it.link()" :text="$loop.it.site().localeCode()"></option></ctx></select></nav></ctx>
+              <ctx :if="$page.locales().len.eq(2)"><nav class="lang-nav"><ctx :loop="$page.locales()"><a href="$loop.it.link()" :text="$loop.it.site().localeCode()"></a></ctx></nav></ctx>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_theme_toggle')">
+              <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+                <div class="$ctx.a">              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('darkmode')"><div class="theme-toggle"><input type="checkbox" id="theme-dark" onchange="localStorage.setItem('notizine-theme',this.checked?'dark':'light');document.documentElement.setAttribute('data-theme',this.checked?'dark':'')"><label for="theme-dark" title="Toggle theme"></label></div></ctx>                </div></ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_spacer')">
+              <span class="flex-spacer"></span>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_explorer')">
+              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('explorer')">
+                <ul class="explorer-tree">
+                  <li :loop="$site.index().subpages()">
+<ctx :if="$loop.it.link().endsWith('tags/').or($loop.it.link().endsWith('search/')).or($loop.it.link().endsWith('recents/')).or($loop.it.link().endsWith('explorer/')).not()">
+                    <ctx :if="$loop.it.isSection()">
+                      <details><summary><a href="$loop.it.link()" :text="$loop.it.title"></a></summary>
+                        <ctx :if="$loop.it.leaves().len.gt(0)"><ul><li :loop="$loop.it.leaves()"><a href="$loop.it.link()" :text="$loop.it.title"></a></li></ul></ctx>
+                      </details>
+                    </ctx>
+                    <ctx :if="$loop.it.isSection().not()"><a href="$loop.it.link()" :text="$loop.it.title"></a></ctx>
+                  </ctx>
+
+                  </li>
+                </ul>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
+              <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
+                <ctx :if="$page.isSection().not()">
+                  <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
+                </ctx>
+              </ctx>
+            </ctx>
+            <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
+              <ctx :if="$page.isSection().not()">
+                <ctx :if="$page.hasPrev().or($page.hasNext())">
+                  <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
+                </ctx>
+              </ctx>
+            </ctx>
+          </ctx></div>
+        </ctx>
+      </aside>
+    </ctx>
+  </div>
+  <footer id="footer">
+    <ctx :loop="$site.asset('notizine.ziggy').ziggy().get('slots').get('footer')">
+      <div class="slot-row"><ctx :loop="$loop.it">
+        <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs').or($loop.it.splitN(':',0).eql('_prev_next')).or($loop.it.splitN(':',0).eql('_header')).or($loop.it.splitN(':',0).eql('_footer_text')).or($loop.it.splitN(':',0).eql('_recents')).or($loop.it.splitN(':',0).eql('_lang_nav')).or($loop.it.splitN(':',0).eql('_theme_toggle')).or($loop.it.splitN(':',0).eql('_spacer')).or($loop.it.splitN(':',0).eql('_explorer')).not()">
+          <ctx name="$loop.it.splitN(':',0)">
+            <ctx align="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+              <div class="$ctx.align" :html="$site.asset($ctx.name.prefix('.cache/modules/').suffix('.html')).bytes()"></div>
+            </ctx>
+          </ctx>
+        </ctx>
+        <ctx :if="$loop.it.splitN(':',0).eql('_header')">
+          <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+            <div class="$ctx.a">          <a href="$site.index().link()" class="site-title" :text="$site.title"></a>            </div></ctx>
+        </ctx>
+        <ctx :if="$loop.it.splitN(':',0).eql('_footer_text')">
+          <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))"><div class="$ctx.a"><p class="footer-text"><span :text="$i18n.get('generated_by')"></span> <a href="https://zine-ssg.io">Zine</a> <span :text="$i18n.get('with')"></span> <a href="https://notizine.sccl.cc">notizine</a></p></div></ctx>
+        </ctx>
+        <ctx :if="$loop.it.splitN(':',0).eql('_recents')">
+          <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+            <div class="$ctx.a">          <div class="module module-recents"><a href="$site.page('recents').link()"><h3 :text="$i18n.get('recents_title')"></h3></a><ctx :loop="$site.index().leaves(5)"><div class="recent-item"><a href="$loop.it.link()" :text="$loop.it.title"></a><time :text="$loop.it.date.format('2006-01-02')"></time></div></ctx></div>            </div></ctx>
+        </ctx>
+        <ctx :if="$loop.it.splitN(':',0).eql('_lang_nav')">
+          <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+            <div class="$ctx.a">          <ctx :if="$page.locales().len.gt(2)"><nav class="lang-nav"><select onchange="location=this.value"><ctx :loop="$page.locales()"><option value="$loop.it.link()" :text="$loop.it.site().localeCode()"></option></ctx></select></nav></ctx>
+          <ctx :if="$page.locales().len.eq(2)"><nav class="lang-nav"><ctx :loop="$page.locales()"><a href="$loop.it.link()" :text="$loop.it.site().localeCode()"></a></ctx></nav></ctx>            </div></ctx>
+        </ctx>
+        <ctx :if="$loop.it.splitN(':',0).eql('_theme_toggle')">
+          <ctx a="$loop.it.endsWith(':right').then('right',$loop.it.endsWith(':center').then('center','left'))">
+            <div class="$ctx.a">          <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('darkmode')"><div class="theme-toggle"><input type="checkbox" id="theme-dark" onchange="localStorage.setItem('notizine-theme',this.checked?'dark':'light');document.documentElement.setAttribute('data-theme',this.checked?'dark':'')"><label for="theme-dark" title="Toggle theme"></label></div></ctx>            </div></ctx>
+        </ctx>
+        <ctx :if="$loop.it.splitN(':',0).eql('_spacer')">
+          <span class="flex-spacer"></span>
+        </ctx>
+        <ctx :if="$loop.it.splitN(':',0).eql('_explorer')">
+          <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('explorer')">
+            <ul class="explorer-tree">
+              <li :loop="$site.index().subpages()">
+<ctx :if="$loop.it.link().endsWith('tags/').or($loop.it.link().endsWith('search/')).or($loop.it.link().endsWith('recents/')).or($loop.it.link().endsWith('explorer/')).not()">
+                <ctx :if="$loop.it.isSection()">
+                  <details><summary><a href="$loop.it.link()" :text="$loop.it.title"></a></summary>
+                    <ctx :if="$loop.it.leaves().len.gt(0)"><ul><li :loop="$loop.it.leaves()"><a href="$loop.it.link()" :text="$loop.it.title"></a></li></ul></ctx>
+                  </details>
+                </ctx>
+                <ctx :if="$loop.it.isSection().not()"><a href="$loop.it.link()" :text="$loop.it.title"></a></ctx>
+              </ctx>
+
+              </li>
+            </ul>
+          </ctx>
+        </ctx>
+        <ctx :if="$loop.it.splitN(':',0).eql('_breadcrumbs')">
+          <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('breadcrumbs')">
+            <ctx :if="$page.isSection().not()">
+              <nav class="breadcrumbs"><a href="$site.index().link()" :text="$i18n.get('home')"></a><span> / </span><a href="$page.parentSection().link()" :text="$page.parentSection().title"></a><span> / </span><span :text="$page.title"></span></nav>
+            </ctx>
+          </ctx>
+        </ctx>
+        <ctx :if="$loop.it.splitN(':',0).eql('_prev_next')">
+          <ctx :if="$page.isSection().not()">
+            <ctx :if="$page.hasPrev().or($page.hasNext())">
+              <nav class="prev-next"><ctx :if="$page.prevPage?()"><a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a></ctx><ctx :if="$page.nextPage?()"><a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a></ctx></nav>
+            </ctx>
+          </ctx>
+        </ctx>
+      </ctx></div>
     </ctx>
   </footer>
 </body>

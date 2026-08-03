@@ -137,11 +137,11 @@ body {
 }
 
 .zone-left {
-  display: var(--left-display, none);
+  display: var(--left-display, block);
 }
 
 .zone-right {
-  display: var(--right-display, none);
+  display: var(--right-display, block);
 }
 
 .slot-row {

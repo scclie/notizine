@@ -215,6 +215,24 @@ function generatePerPageCSS(config, modules, siteData) {
   }
 }
 
+function writeCombinedCSS(config, modules) {
+  const baseCSS = readFileSync(join(ROOT, 'assets', 'css', 'base.css'), 'utf-8');
+  const codeCSS = readFileSync(join(ROOT, 'assets', 'css', 'code.css'), 'utf-8');
+  const customCSS = config.custom_css
+    ? readFileSync(join(ROOT, 'assets', config.custom_css), 'utf-8') : '';
+
+  let css = baseCSS + '\n' + codeCSS;
+  for (const mod of Object.values(modules)) {
+    const stylePath = join(mod.dir, 'style.css');
+    if (existsSync(stylePath)) {
+      css += '\n' + readFileSync(stylePath, 'utf-8');
+    }
+  }
+  css += '\n' + customCSS;
+
+  writeFileSync(join(ROOT, 'assets', '.cache', 'all.css'), css);
+}
+
 function writeManifest(modules, siteData) {
   const manifest = {
     modules: {},
@@ -243,7 +261,7 @@ async function main() {
   console.log(`[generate] Found ${Object.keys(modules).length} modules`);
 
   await runGenerators(modules, siteData);
-  generatePerPageCSS(config, modules, siteData);
+  writeCombinedCSS(config, modules);
   writeManifest(modules, siteData);
   console.log('[generate] Done.');
 }

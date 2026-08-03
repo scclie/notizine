@@ -1,0 +1,37 @@
+.explorer-tree {
+  list-style: none;
+  padding-left: 0;
+  font-size: 0.9rem;
+}
+
+.explorer-tree ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.explorer-tree li {
+  margin: 0.2rem 0;
+}
+
+.explorer-tree summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.explorer-tree summary:hover {
+  color: var(--accent2);
+}
+
+.explorer-tree details {
+  margin: 0.3rem 0;
+}
+
+.explorer-tree a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.explorer-tree a:hover {
+  color: var(--accent);
+}

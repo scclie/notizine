@@ -1,0 +1,5 @@
+.{
+    .name = "_explorer",
+    .type = "builtin",
+    .description = "Site tree explorer (sections + pages)",
+}

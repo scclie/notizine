@@ -17,9 +17,11 @@
       </aside>
     </ctx>
     <div :html="$page.content()"></div>
-    <ctx :if="$page.tags.len.gt(0)">
-      <ctx :loop="$page.tags">
-        <a class="tag" href="$site.page('tags').link().suffix('?tag=').suffix($loop.it)" :text="$loop.it"></a>
+    <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('tags')">
+      <ctx :if="$page.tags.len.gt(0)">
+        <ctx :loop="$page.tags">
+          <a class="tag" href="$site.page('tags').link().suffix('?tag=').suffix($loop.it)" :text="$loop.it"></a>
+        </ctx>
       </ctx>
     </ctx>
     <ctx :if="$page.hasPrev().or($page.hasNext())">
