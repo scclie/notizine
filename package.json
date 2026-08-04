@@ -1,11 +1,11 @@
 {
   "name": "notizine",
-  "version": "0.2.0",
+  "version": "v0.3+z0.13",
   "description": "Multilingual modular SSG for digital gardens and blogs",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "zine",
+    "dev": "node scripts/generate.mjs && zine",
     "build": "node scripts/build.mjs",
     "preview": "npm run build && npx serve public"
   },

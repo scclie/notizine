@@ -1,12 +1,12 @@
 {
   // ── Features ──  Toggle site features on/off. false = removed from output.
   "features": {
-    "recents": true,            // /recents/ – latest posts list
-    "explorer": true,           // /explorer/ – full site tree
-    "search": true,             // /search/ – client-side search page
+    "recents": true,            // /recents/ - latest posts list
+    "explorer": true,           // /explorer/ - full site tree
+    "search": true,             // /search/ - client-side search page
     "darkmode": true,           // ☀/☾ theme toggle + prefers-color-scheme
     "translation_notice": true, // "auto-translated" banner on non-primary locale pages
-    "tags": true,               // /tags/ – tag listing + JS filter
+    "tags": true,               // /tags/ - tag listing + JS filter
     "breadcrumbs": true,        // Home / Section / Page breadcrumb chain
     "og_images": true,          // 1200×630 PNG social preview images
     "rss": false,               // RSS feed + discovery link + footer button
@@ -77,9 +77,9 @@
 
   // ── Fonts ──  CSS font-family values. Empty = system default.
   "fonts": {
-    "heading": "",              // h1-h6, site title  –  e.g. "'Inter', sans-serif"
-    "body": "",                 // body text  –  e.g. "'Inter', sans-serif"
-    "code": ""                  // <code>, <pre>  –  e.g. "'JetBrains Mono', monospace"
+    "heading": "",              // h1-h6, site title  -  e.g. "'Inter', sans-serif"
+    "body": "",                 // body text  -  e.g. "'Inter', sans-serif"
+    "code": ""                  // <code>, <pre>  -  e.g. "'JetBrains Mono', monospace"
   },
   "google_fonts": "",           // Google Fonts query: "Inter:wght@400;700"
 
@@ -87,7 +87,7 @@
   "og": {
     "site_name": "notizine",    // Displayed at top-left of OG image
     "font_family": "system-ui, sans-serif",  // Font family for OG image text
-    // Colors — Nord palette defaults
+    // Colors - Nord palette defaults
     "bg_top": "#2e3440",        // Gradient top
     "bg_bottom": "#3b4252",     // Gradient bottom (or use background_image below)
     "accent": "#5e81ac",        // Left accent bar

@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from '
 import { join, extname } from 'node:path';
 
 export default async function purge(publicDir) {
-  const manifestPath = join(process.cwd(), '.cache', 'manifest.json');
+  const manifestPath = join(process.cwd(), 'assets', '.cache', 'manifest.json');
   const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf-8')) : null;
 
   const htmlFiles = findAllHTML(publicDir);

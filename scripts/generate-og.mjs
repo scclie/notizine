@@ -63,7 +63,7 @@ export default async function generateOG(siteData) {
   ${dateBlock}
 </svg>`;
 
-    const outDir = join(process.cwd(), 'public', page.link.replace(/^\//, ''));
+    const outDir = join(process.cwd(), 'assets', '.cache', 'og-images', page.link.replace(/^\//, ''));
     mkdirSync(outDir, { recursive: true });
     await sharp(Buffer.from(svg)).png().toFile(join(outDir, 'og.png'));
     count++;
