@@ -42,6 +42,9 @@
     "before_main": [
       ["_breadcrumbs"]
     ],
+    "center": [
+      ["_content"]
+    ],
     "left": [
       ["divider"],
       ["_recents"],

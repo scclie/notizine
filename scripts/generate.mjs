@@ -5,6 +5,7 @@ import { default as generateOG } from './generate-og.mjs';
 
 const ROOT = process.cwd();
 const CACHE_DIR = join(ROOT, 'assets', '.cache', 'modules');
+const ASSETS_JSON = join(ROOT, 'assets', '.cache', 'per-page-assets.json');
 const CONFIG_PATH = join(ROOT, 'assets', 'notizine.ziggy');
 const MODULES_DIR = join(ROOT, 'modules');
 const I18N_DIR = join(ROOT, 'i18n');
@@ -487,6 +488,29 @@ function collectImageMappings(siteData) {
   return mappings;
 }
 
+function collectPerPageAssets(siteData) {
+  const assets = {};
+  for (const page of siteData.pages) {
+    if (!page.filePath) continue;
+    const dir = dirname(page.filePath);
+    const base = basename(page.filePath, '.smd');
+    const cssPath = join(dir, base + '.css');
+    const jsPath = join(dir, base + '.js');
+    const entry = {};
+    if (existsSync(cssPath)) {
+      const css = readFileSync(cssPath, 'utf-8').trim();
+      if (css.length > 0) entry.css = css;
+    }
+    if (existsSync(jsPath)) {
+      const js = readFileSync(jsPath, 'utf-8').trim();
+      if (js.length > 0) entry.js = js;
+    }
+    const key = page.link === '/' ? 'index' : '/' + page.link;
+    assets[key] = entry;
+  }
+  return assets;
+}
+
 async function main() {
   console.log('[generate] Starting pre-generation...');
   const config = readConfig();
@@ -494,6 +518,10 @@ async function main() {
   const i18n = readI18n();
   const pages = scanPages(zineConfig);
   const siteData = { config, zineConfig, i18n, pages };
+
+  const perPageAssets = collectPerPageAssets(siteData);
+  writeFileSync(ASSETS_JSON, JSON.stringify(perPageAssets));
+  console.log(`[generate] Written per-page assets for ${Object.keys(perPageAssets).length} pages`);
 
   await generateOG(siteData);
 

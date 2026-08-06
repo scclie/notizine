@@ -39,5 +39,17 @@ for (const file of htmlFiles) {
   assert(emDash.length === 0, `No em-dash in ${rel}`);
 }
 
+// Test: center slot renders content
+const indexHtml = readFileSync(join(PUBLIC, 'index.html'), 'utf-8');
+assert(indexHtml.includes('<p>Welcome'), 'Center slot renders content in index.html');
+
+const assetsJsonPath = join(process.cwd(), 'assets', '.cache', 'per-page-assets.json');
+assert(existsSync(assetsJsonPath), 'per-page-assets.json exists after build');
+
+// Test: page without companion files has no unwanted artifacts
+const postsHtml = readFileSync(join(PUBLIC, 'posts', 'hello-world', 'index.html'), 'utf-8');
+const injectedCount = (postsHtml.match(/per-page-assets/g) || []).length;
+assert(injectedCount === 0, 'Pages without companion files have no per-page-assets references');
+
 console.log(`[test] ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
