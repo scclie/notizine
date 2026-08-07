@@ -3,20 +3,25 @@
   <meta property="og:type" content="website">
 </head>
 <main id="content">
-  <h1 :text="$page.title"></h1>
-  <ctx :loop="$site.index().leaves(50)">
-    <article>
-      <h2><a href="$loop.it.link()" :text="$loop.it.title"></a></h2>
-      <time :text="$loop.it.date.format('2006-01-02')"></time>
-      <ctx :if="$loop.it.description.len().gt(0)">
-        <p :text="$loop.it.description"></p>
-      </ctx>
-      <ctx :if="$loop.it.tags.len.gt(0)">
-        <ctx :loop="$loop.it.tags">
-          <a class="tag" href="$site.page('tags').link().suffix('?tag=').suffix($loop.it)" :text="$loop.it"></a>
-        </ctx>
-      </ctx>
-    </article>
-  </ctx>
+  <div class="page-content">
+    <h1 :text="$page.title"></h1>
+    <ctx :loop="$site.page('posts').leaves(50)">
+      <article>
+        <div class="recent-row">
+          <h2><a href="$loop.it.link()" :text="$loop.it.title"></a></h2>
+          <time :text="$loop.it.date.format('2006-01-02')"></time>
+        </div>
+        <div class="recent-row">
+          <p :text="$loop.it.description"></p>
+          <div>
+            <ctx :if="$loop.it.tags.len.gt(0)">
+              <ctx :loop="$loop.it.tags">
+                <a class="tag" href="$site.page('tags').link().suffix('?tag=').suffix($loop.it)" :text="$loop.it"></a>
+              </ctx>
+            </ctx>
+          </div>
+        </div>
+      </article>
+    </ctx>
+  </div>
 </main>
-

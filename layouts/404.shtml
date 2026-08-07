@@ -1,4 +1,6 @@
 <extend template="base.shtml">
 <main id="content">
-  <h1>Not Found</h1>
+  <div class="page-content">
+    <h1>Not Found</h1>
+  </div>
 </main>

@@ -17,4 +17,8 @@
     "search_placeholder": "Search...",
     "home": "Home",
     "see_more": "See more",
+    "prev_short": "<- prev",
+    "next_short": "next ->",
+    "random_note": "random note"
+
 }

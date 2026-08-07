@@ -3,37 +3,37 @@
   <meta property="og:type" content="article">
 </head>
 <main id="content">
-  <article>
-    <header>
-      <h1 :text="$page.title"></h1>
-      <time :text="$page.date.format('2006-01-02')"></time>
-    </header>
-    <ctx :if="$page.custom.get?('auto_translated')">
-      <aside>
-        <p :text="$i18n.get('translation_notice')"></p>
-        <ctx :if="$page.custom.get?('original_path')">
-          <a :href="$if" :text="$i18n.get('read_original')"></a>
-        </ctx>
-      </aside>
-    </ctx>
-    <div :html="$page.content()"></div>
-    <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('tags')">
-      <ctx :if="$page.tags.len.gt(0)">
-        <ctx :loop="$page.tags">
-          <a class="tag" href="$site.page('tags').link().suffix('?tag=').suffix($loop.it)" :text="$loop.it"></a>
+  <div class="page-content">
+    <article>
+      <header>
+        <h1 :text="$page.title"></h1>
+        <time :text="$page.date.format('2006-01-02')"></time>
+      </header>
+      <ctx :if="$page.custom.get?('auto_translated')">
+        <aside>
+          <p :text="$i18n.get('translation_notice')"></p>
+          <ctx :if="$page.custom.get?('original_path')">
+            <a :href="$if" :text="$i18n.get('read_original')"></a>
+          </ctx>
+        </aside>
+      </ctx>
+      <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('tags')">
+        <ctx :if="$page.tags.len.gt(0)">
+          <ctx :loop="$page.tags">
+            <a class="tag" href="$site.page('tags').link().suffix('?tag=').suffix($loop.it)" :text="$loop.it"></a>
+          </ctx>
         </ctx>
       </ctx>
-    </ctx>
-    <ctx :if="$page.hasPrev().or($page.hasNext())">
-      <nav>
-        <ctx :if="$page.prevPage?()">
-          <a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a>
-        </ctx>
-        <ctx :if="$page.nextPage?()">
-          <a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a>
-        </ctx>
-      </nav>
-    </ctx>
-  </article>
+      <ctx :if="$page.hasPrev().or($page.hasNext())">
+        <nav>
+          <ctx :if="$page.prevPage?()">
+            <a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a>
+          </ctx>
+          <ctx :if="$page.nextPage?()">
+            <a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a>
+          </ctx>
+        </nav>
+      </ctx>
+    </article>
+  </div>
 </main>
-

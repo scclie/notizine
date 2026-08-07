@@ -1,0 +1,16 @@
+---
+.title = "About notizine",
+.description = "About the notizine project",
+.date = .date("2026-01-01T00:00:00"),
+.layout = "page.shtml",
+---
+
+**notizine** is an open-source starter template built on top of
+[Zine](https://zine-ssg.io), a fast static site generator.
+
+Zine gives you a powerful template engine and content pipeline.
+Notizine adds a JSON-like config layer on top - you rearrange modules,
+toggle features, and customize layout without touching template code.
+
+Everything you see on this site - the sidebar widgets, the language
+switcher, the dark mode toggle - is configured in a single file.

@@ -17,4 +17,8 @@
     "search_placeholder": "Поиск...",
     "home": "Главная",
     "see_more": "Все записи",
+    "prev_short": "<- назад",
+    "next_short": "вперёд ->",
+    "random_note": "случайная заметка"
+
 }

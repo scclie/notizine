@@ -50,6 +50,34 @@ assert(existsSync(assetsJsonPath), 'per-page-assets.json exists after build');
 const postsHtml = readFileSync(join(PUBLIC, 'posts', 'hello-world', 'index.html'), 'utf-8');
 const injectedCount = (postsHtml.match(/per-page-assets/g) || []).length;
 assert(injectedCount === 0, 'Pages without companion files have no per-page-assets references');
+// 1. Content not duplicated (task-2: body text should appear exactly once)
+const helloHtml = readFileSync(join(PUBLIC, 'posts', 'hello-world', 'index.html'), 'utf-8');
+const bodyCount = (helloHtml.match(/Hello! This is an example post/g) || []).length;
+assert(bodyCount === 1, 'Content body not duplicated in post page');
+
+// 2. .recent-meta used instead of <time> for recents display
+const recentsHtml = readFileSync(join(PUBLIC, 'recents', 'index.html'), 'utf-8');
+const recentMetaCount = (recentsHtml.match(/class="recent-meta"/g) || []).length;
+assert(recentMetaCount > 0, '.recent-meta present in output');
+
+// 3. per-page-assets.json has wordcount/readtime for a known page
+const assetsJson = JSON.parse(readFileSync(join(process.cwd(), 'assets', '.cache', 'per-page-assets.json'), 'utf-8'));
+const helloKey = '/posts/hello-world/';
+assert(typeof assetsJson[helloKey].wordcount === 'number', 'Page has wordcount');
+assert(typeof assetsJson[helloKey].readtime === 'number', 'Page has readtime');
+
+// section.shtml renders subpages
+const postsSectionHtml = readFileSync(join(PUBLIC, 'posts', 'index.html'), 'utf-8');
+assert(postsSectionHtml.includes('Hello, World!'), 'Posts section lists subpages');
+
+// _recents uses section-based filtering (no URL filter)
+assert(!recentsHtml.includes('/tags/"'), 'No tags link in recents items');
+assert(!recentsHtml.includes('/search/'), 'No search link in recents items');
+
+// No _recents URL filter remnants in base.shtml (explorer filters are separate)
+const baseHtml = readFileSync(join(process.cwd(), 'layouts', 'templates', 'base.shtml'), 'utf-8');
+const oldRecentsFilter = (baseHtml.match(/endsWith\('posts\/'\)/g) || []).length;
+assert(oldRecentsFilter === 0, 'No _recents URL filter remnants in base.shtml');
 
 console.log(`[test] ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

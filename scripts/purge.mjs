@@ -44,7 +44,7 @@ export default async function purge(publicDir) {
   }
 
   const saved = totalBefore - totalAfter;
-  console.log(`[purge] CSS: ${(totalBefore/1024).toFixed(1)}KB → ${(totalAfter/1024).toFixed(1)}KB (saved ${(saved/1024).toFixed(1)}KB)`);
+  console.log(`[purge] CSS: ${(totalBefore/1024).toFixed(1)}KB -> ${(totalAfter/1024).toFixed(1)}KB (saved ${(saved/1024).toFixed(1)}KB)`);
 }
 
 function findAllHTML(dir) {

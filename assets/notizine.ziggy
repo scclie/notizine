@@ -27,36 +27,43 @@
   },
 
   // ── Slots (module system) ──
-  // Each zone is an ordered list of module rows.
-  // Built-in modules start with _   Static modules: just the name (e.g. "divider")
-  // Each inner array = one flex row. Modules in the same row share one line.
-  // :center or :right suffix aligns the module (left is default).
-  //   "_header:center"  →  centered title
-  //   "badges:center"    →  centered badges
-  //   "_footer_text:right"  →  right-aligned footer text
-  // Empty array = zone hidden.
+  // Seven zones: header, before_main, center, left, right, after_main, footer.
+  // Each zone is an ordered list of ROWS. Each row is an array of module entries.
+  // Modules in the same row appear next to each other in a flex row.
+  //
+  // Module entry fields:
+  //   "module": module name (built-in start with _, custom use directory name)
+  //   "align":  "left" | "center" | "right"  (default: "left")
+  //   "section": section name for _recents / _explorer (e.g. "posts")
+  //
+  // Built-in modules: _header, _theme_toggle, _lang_nav, _spacer,
+  //   _breadcrumbs, _recents, _explorer, _footer_text, _back_to_top, _content
+  //
+  // Example: [{ "module": "_recents", "section": "posts", "show": ["date"] }]
+  // Empty array [] = zone hidden.
   "slots": {
     "header": [
-      ["_header", "_theme_toggle", "_spacer", "_lang_nav"]
+      [{ "module": "_header" },{ "module": "_theme_toggle" },{ "module": "_spacer" },{ "module": "_lang_nav" }]
     ],
     "before_main": [
-      ["_breadcrumbs"]
+      [{ "module": "divider" }],
+      [{ "module": "_breadcrumbs" }]
     ],
     "center": [
-      ["_content"]
+      [{ "module": "_content" }]
     ],
+    // Left sidebar: divider + recent posts from "posts" section
     "left": [
-      ["divider"],
-      ["_recents"],
-      ["divider"],
-      ["_explorer"]
+      [{ "module": "divider" }],
+      [{ "module": "_recents", "show": ["date"] }]
     ],
     "right": [],
     "after_main": [],
     "footer": [
-      ["badges:center"],
-      ["_footer_text:center"],
-      ["_back_to_top:center"]
+      [{ "module": "divider", "align": "center" }],
+      [{ "module": "badges", "align": "center" }],
+      [{ "module": "_footer_text", "align": "center" }],
+      [{ "module": "_back_to_top", "align": "center" }]
     ]
   },
 
@@ -65,7 +72,7 @@
     // Three-column CSS Grid.
     // Column 1 = left sidebar, 2 = center (main content), 3 = right sidebar.
     // "auto" = show, "hide" = hidden, "200px" = fixed width.
-    "columns": ["auto", "720px", "auto"],
+    "columns": ["auto", "720px", "auto"],  // left sidebar, main content, right sidebar
     "gap": "1.5rem"              // Gap between grid columns
   },
 
@@ -74,8 +81,8 @@
 
   // ── Social ──
   "social": {
-    "github": "",               // GitHub username → renders link to github.com/<username>
-    "mastodon": ""              // Mastodon profile URL → adds rel="me"
+    "github": "",              // GitHub username (e.g. "torvalds") -- renders link to github.com/<username>
+    "mastodon": ""             // Mastodon profile URL (e.g. "https://mastodon.social/@user")
   },
 
   // ── Fonts ──  CSS font-family values. Empty = system default.
