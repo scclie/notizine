@@ -7,14 +7,12 @@
     <h1 :text="$page.title"></h1>
     <ctx :loop="$site.index().leaves()">
       <ctx :if="$loop.it.tags.len.gt(0)">
-        <article>
-          <div class="recent-row">
-            <a href="$loop.it.link()" :text="$loop.it.title"></a>
-            <div>
-              <ctx :loop="$loop.it.tags">
-                <a class="tag" href="$site.page('tags').link().suffix('?tag=').suffix($loop.it)" :text="$loop.it"></a>
-              </ctx>
-            </div>
+        <article class="recent-row recent-row-stretch">
+          <a class="recent-row-title" href="$loop.it.link()" :text="$loop.it.title"></a>
+          <div>
+            <ctx :loop="$loop.it.tags">
+              <a class="tag" href="$site.page('tags').link().suffix('?tag=').suffix($loop.it)" :text="$loop.it"></a>
+            </ctx>
           </div>
         </article>
       </ctx>

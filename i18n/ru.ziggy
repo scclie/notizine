@@ -19,6 +19,8 @@
     "see_more": "Все записи",
     "prev_short": "<- назад",
     "next_short": "вперёд ->",
-    "random_note": "случайная заметка"
+    "random_note": "случайная заметка",
+    "min_short": "мин",
+    "words_short": "слов"
 
 }

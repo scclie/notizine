@@ -19,6 +19,8 @@
     "see_more": "See more",
     "prev_short": "<- prev",
     "next_short": "next ->",
-    "random_note": "random note"
+    "random_note": "random note",
+    "min_short": "min",
+    "words_short": "words"
 
 }

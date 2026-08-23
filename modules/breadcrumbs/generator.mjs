@@ -1,26 +1,13 @@
-export default async function generate(siteData) {
-  if (!siteData.config.features?.breadcrumbs) {
-    const pages = {};
-    for (const p of siteData.pages) pages[p.link] = '';
-    return { pages };
-  }
-  const i18n = siteData.i18n[siteData.config.language_primary] || Object.values(siteData.i18n)[0] || {};
-  const homeLabel = i18n.home || 'Home';
+import { esc, homeLink } from '../../scripts/lib/api.mjs';
 
-  const pages = {};
-  for (const page of siteData.pages) {
-    if (page.isSection) { pages[page.link] = ''; continue; }
-    const crumbs = [{ link: '/', title: homeLabel }];
-    if (page.parentSection) {
-      crumbs.push({ link: '/' + page.parentSection.link, title: page.parentSection.title });
-    }
-    crumbs.push({ link: null, title: page.title });
-    const parts = crumbs.map(c =>
-      c.link ? `<a href="${c.link}">${escapeHTML(c.title)}</a>` : `<span>${escapeHTML(c.title)}</span>`
-    );
-    pages[page.link] = `<nav class="breadcrumbs">${parts.join(' <span> / </span>')}</nav>`;
+export default async function ({ page, site, params, i18n }) {
+  if (!Array.isArray(site?.pages) || page?.isSection !== false) return '';
+  const home = homeLink(site, page);
+  const parent = site.pages.find(p => p.locale === page.locale && p.link === page.parentLink);
+  const parts = [`<a href="${home}">${i18n('home')}</a>`];
+  if (parent && parent.link !== '/' && parent.link !== home) {
+    parts.push(`<a href="${parent.link}">${esc(parent.title)}</a>`);
   }
-  return { pages };
+  parts.push(`<span>${esc(page.title)}</span>`);
+  return `<nav class="breadcrumbs">${parts.join('<span class="crumb-sep">/</span>')}</nav>`;
 }
-
-function escapeHTML(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }

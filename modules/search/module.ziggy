@@ -1,0 +1,5 @@
+.{
+    .name = "search",
+    .type = "builtin",
+    .description = "Client-side title search over the site model",
+}

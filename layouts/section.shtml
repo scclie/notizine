@@ -17,15 +17,15 @@
       <ctx :loop="$page.subpages()">
         <ctx :if="$loop.it.isSection().not()">
           <article>
-            <div class="recent-row">
-              <a href="$loop.it.link()" :text="$loop.it.title"></a>
-              <time :text="$loop.it.date.format('2006-01-02')"></time>
-            </div>
-            <ctx :if="$loop.it.description.len().gt(0)">
-              <div class="recent-row recent-row-meta">
-                <p :text="$loop.it.description"></p>
+            <a class="recent-row recent-row-block" href="$loop.it.link()">
+              <div class="recent-row-head">
+                <h2 :text="$loop.it.title"></h2>
+                <time :text="$loop.it.date.format('2006-01-02')"></time>
               </div>
-            </ctx>
+              <ctx :if="$loop.it.description.len().gt(0)">
+                <p :text="$loop.it.description"></p>
+              </ctx>
+            </a>
           </article>
         </ctx>
       </ctx>

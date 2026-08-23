@@ -1,25 +1,13 @@
-export default async function generate(siteData) {
-  const i18n = siteData.i18n[siteData.config.language_primary] || Object.values(siteData.i18n)[0] || {};
-  const prevLabel = i18n.previous_page || 'Previous';
-  const nextLabel = i18n.next_page || 'Next';
+import { esc, siblingsOf } from '../../scripts/lib/api.mjs';
 
-  const pages = {};
-  const nonSection = siteData.pages.filter(p => !p.isSection);
-  for (let i = 0; i < nonSection.length; i++) {
-    const page = nonSection[i];
-    const prev = i > 0 ? nonSection[i - 1] : null;
-    const next = i < nonSection.length - 1 ? nonSection[i + 1] : null;
-    if (!prev && !next) {
-      pages[page.link] = '';
-      continue;
-    }
-    let html = '<nav class="prev-next">';
-    if (prev) html += `<a href="/${prev.link}">${prevLabel}: ${escapeHTML(prev.title)}</a>`;
-    if (next) html += `<a href="/${next.link}">${nextLabel}: ${escapeHTML(next.title)}</a>`;
-    html += '</nav>';
-    pages[page.link] = html;
-  }
-  return { pages };
+export default async function ({ page, site, params, i18n }) {
+  if (!site?.pages || page?.isSection !== false) return '';
+  const sib = siblingsOf(site, page);
+  const i = sib.findIndex(p => p.link === page.link);
+  const prev = i > 0 ? sib[i - 1] : null;
+  const next = i >= 0 && i < sib.length - 1 ? sib[i + 1] : null;
+  if (!prev && !next) return '';
+  const a = prev ? `<a href="${prev.link}" class="pn-prev">${i18n('previous_page')}: ${esc(prev.title)}</a>` : '<span></span>';
+  const b = next ? `<a href="${next.link}" class="pn-next">${i18n('next_page')}: ${esc(next.title)}</a>` : '<span></span>';
+  return `<nav class="prev-next">${a}${b}</nav>`;
 }
-
-function escapeHTML(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
