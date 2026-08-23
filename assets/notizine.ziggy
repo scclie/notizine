@@ -1,4 +1,13 @@
 {
+  "site": {
+    "host_url": "https://example.com",
+    "locales": [
+      { "code": "ru", "name": "Русский", "site_title": "notizine", "content_dir_path": "content/ru", "output_prefix_override": null },
+      { "code": "en", "name": "English", "site_title": "notizine", "content_dir_path": "content/en", "output_prefix_override": "" }
+    ]
+  },
+  "theme": "sccl",
+
   // ── Features ──  Toggle site features on/off. false = removed from output.
   "features": {
     "recents": true,            // /recents/ - latest posts list
@@ -39,7 +48,7 @@
   // Built-in modules: _header, _theme_toggle, _lang_nav, _spacer,
   //   _breadcrumbs, _recents, _explorer, _footer_text, _back_to_top, _content
   //
-  // Example: [{ "module": "_recents", "section": "posts", "show": ["date"] }]
+  // Example: [{ "module": "_recents", "section": "posts", "show": ["date", "meta"] }]
   // Empty array [] = zone hidden.
   "slots": {
     "header": [
@@ -52,15 +61,17 @@
     "center": [
       [{ "module": "_content" }]
     ],
-    // Left sidebar: divider + recent posts from "posts" section
+    // Left sidebar: recent posts + recent notes (two branches)
     "left": [
-      [{ "module": "divider" }],
-      [{ "module": "_recents", "show": ["date"] }]
+      [{ "module": "_recents", "id": "_recents_posts", "show": ["date", "meta"] }],
+      [{ "module": "_recents", "id": "_recents_notes", "section": "/notes/", "title": "Notes", "count": 3, "show": ["date", "meta"] }]
     ],
-    "right": [],
+    "right": [
+      [{ "module": "_explorer" }]
+    ],
     "after_main": [],
     "footer": [
-      [{ "module": "divider", "align": "center" }],
+      [{ "module": "divider" }],
       [{ "module": "badges", "align": "center" }],
       [{ "module": "_footer_text", "align": "center" }],
       [{ "module": "_back_to_top", "align": "center" }]
@@ -72,8 +83,22 @@
     // Three-column CSS Grid.
     // Column 1 = left sidebar, 2 = center (main content), 3 = right sidebar.
     // "auto" = show, "hide" = hidden, "200px" = fixed width.
-    "columns": ["auto", "720px", "auto"],  // left sidebar, main content, right sidebar
-    "gap": "1.5rem"              // Gap between grid columns
+    "columns": ["auto", "min(70vw, 55rem)", "auto"],  // left sidebar, main content, right sidebar
+    "gap": "1.5rem",             // Gap between grid columns
+    "width": "min(70vw, 55rem)",
+    "spacing": 1
+  },
+
+  "slots_overrides": {
+    // /ru/ pages resolve sections against the ru prefix
+    "/ru/": {
+      "left": [
+        [{ "module": "_recents", "id": "_recents_ru", "section": "/ru/posts/", "show": ["date", "meta"] }],
+        [{ "module": "_recents", "id": "_recents_notes_ru", "section": "/ru/notes/", "title": "Заметки", "count": 3, "show": ["date", "meta"] }]
+      ]
+    },
+    "/search/": { "center": [ [ { "module": "search", "id": "search" } ] ] },
+    "/ru/search/": { "center": [ [ { "module": "search", "id": "search" } ] ] }
   },
 
   // ── Custom CSS ──
