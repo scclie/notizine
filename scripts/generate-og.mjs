@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 export default async function generateOG({ config, model }) {
@@ -31,6 +31,15 @@ export default async function generateOG({ config, model }) {
   const W = 1200, H = 630;
   const pages = model.pages.filter(p => !p.isSection && p.title);
   let count = 0;
+
+  const ogCache = join(process.cwd(), 'assets', '.cache', 'og-images');
+  const validKeys = [...new Set(pages.map(p => p.link.replace(/^\//, '')))];
+  try {
+    for (const entry of readdirSync(ogCache)) {
+      const alive = validKeys.some(k => k === entry || k.startsWith(entry + '/'));
+      if (!alive) rmSync(join(ogCache, entry), { recursive: true, force: true });
+    }
+  } catch {}
 
   for (const page of pages) {
     const title = escapeXML(truncate(page.title, 50));

@@ -6,7 +6,7 @@
       { "code": "en", "name": "English", "site_title": "notizine", "content_dir_path": "content/en", "output_prefix_override": "" }
     ]
   },
-  "theme": "sccl",
+  "theme": "nord-default",
 
   // ── Features ──  Toggle site features on/off. false = removed from output.
   "features": {
@@ -18,7 +18,7 @@
     "tags": true,               // /tags/ - tag listing + JS filter
     "breadcrumbs": true,        // Home / Section / Page breadcrumb chain
     "og_images": true,          // 1200×630 PNG social preview images
-    "rss": false,               // RSS feed + discovery link + footer button
+    "rss": false,                // RSS feed + discovery link + footer button
     "inline_mode": true         // Inline CSS into <style> (zero external CSS requests)
   },
   "language_primary": "ru",     // Primary locale for i18n defaults
@@ -67,13 +67,14 @@
       [{ "module": "_recents", "id": "_recents_notes", "section": "/notes/", "title": "Notes", "count": 3, "show": ["date", "meta"] }]
     ],
     "right": [
-      [{ "module": "_explorer" }]
+      [{ "module": "_explorer", "exclude": ["/404/", "/ru/404/"] }]
     ],
     "after_main": [],
     "footer": [
       [{ "module": "divider" }],
       [{ "module": "badges", "align": "center" }],
       [{ "module": "_footer_text", "align": "center" }],
+      [{ "module": "_rss_link", "align": "center" }],
       [{ "module": "_back_to_top", "align": "center" }]
     ]
   },

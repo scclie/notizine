@@ -5,12 +5,18 @@ A modular, multilingual static site starter built on [Zine](https://zine-ssg.io)
 **What it does:** Zine is a fast static site generator. Notizine wraps it
 with a config layer so you don't write templates by hand. Configure
 sidebars, features, and layout in one file. Write content in Markdown.
-Get a bilingual site with dark mode, search, tags, OG images, and more --
-out of the box.
+Get a bilingual site with dark mode, instant client-side search, tags,
+RSS feeds, OG images, and more -- out of the box.
+
+A small vanilla JS bundle (~4KB, no framework) handles the interactive
+bits: theme toggle, live search over a prebuilt index, random-note
+navigation, back-to-top. CSS is inlined into pages by default; JS loads
+as one tiny deferred file.
 
 ## Quick start
 
 ```bash
+nix-shell        # provides node, zine, python deps (see shell.nix)
 npm install
 npm run dev      # opens http://localhost:1987
 ```
@@ -35,9 +41,11 @@ Then:
 
 ## This demo site
 
-You're looking at a demo. The sidebar shows **Recent Notes** (latest posts
-from the `posts/` section) and a **Site Explorer** (clickable tree of all
-pages). The header has a **language switcher** (RU/EN) and **theme toggle**.
-All of this is configured in `assets/notizine.ziggy` -- no templates edited.
+You're looking at notizine's own documentation, built with notizine.
+The left sidebar lists the **Documentation** tree; the right sidebar
+shows recent **Updates** with an RSS feed at `/updates/index.xml`.
+The header has a **theme toggle**; the footer has badges and an **RSS**
+link. All of this is configured in `assets/notizine.ziggy` -- no
+templates edited.
 
 Build a blog, a digital garden, a portfolio -- it's all the same starter.

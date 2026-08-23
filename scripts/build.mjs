@@ -26,6 +26,16 @@ async function main() {
     console.log('[build] No OG images to copy (disabled or no pages with titles)');
   }
 
+  console.log('[build] Step 2.7/4: 404 page');
+  const notFoundSrc = join(ROOT, 'public', '404', 'index.html');
+  if (existsSync(notFoundSrc)) {
+    const { copyFileSync: cp } = await import('node:fs');
+    cp(notFoundSrc, join(ROOT, 'public', '404.html'));
+    console.log('[404] public/404.html written');
+  } else {
+    console.log('[404] No /404/ page in content, skipping');
+  }
+
   console.log('[build] Step 3/4: purge');
   const { default: purge } = await import('./purge.mjs');
   await purge(join(ROOT, 'public'));
