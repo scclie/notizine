@@ -70,9 +70,11 @@ assert(typeof assetsJson[helloKey].readtime === 'number', 'Page has readtime');
 const postsSectionHtml = readFileSync(join(PUBLIC, 'posts', 'index.html'), 'utf-8');
 assert(postsSectionHtml.includes('Hello, World!'), 'Posts section lists subpages');
 
-// _recents uses section-based filtering (no URL filter)
-assert(!recentsHtml.includes('/tags/"'), 'No tags link in recents items');
-assert(!recentsHtml.includes('/search/'), 'No search link in recents items');
+// _recents uses section-based filtering (no URL filter); scope to widget items
+// (explorer in the sidebar may legitimately link /tags/ and /search/)
+const recentItemLinks = [...recentsHtml.matchAll(/<div class="recent-item"><a href="([^"]*)"/g)].map(m => m[1]);
+assert(recentItemLinks.length > 0, 'recents items have links');
+assert(!recentItemLinks.some(l => l.includes('/tags/') || l.includes('/search/')), 'No tags/search link in recents items');
 
 // No _recents URL filter remnants in base.shtml (explorer filters are separate)
 const baseHtml = readFileSync(join(process.cwd(), 'layouts', 'templates', 'base.shtml'), 'utf-8');

@@ -1,0 +1,8 @@
+---
+.title = "Post B",
+.date = .date("2026-03-01T00:00:00"),
+.tags = ["y"],
+.description = "Second fixture post",
+---
+
+More words for the second fixture post body.

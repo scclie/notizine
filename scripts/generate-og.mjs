@@ -2,9 +2,9 @@ import sharp from 'sharp';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-export default async function generateOG(siteData) {
-  const og = siteData.config.og || {};
-  if (!siteData.config.features?.og_images) {
+export default async function generateOG({ config, model }) {
+  const og = config.og || {};
+  if (!config.features?.og_images) {
     console.log('[generate-og] Skipped (og_images disabled)');
     return;
   }
@@ -29,7 +29,7 @@ export default async function generateOG(siteData) {
   const siteName = og.site_name || '';
 
   const W = 1200, H = 630;
-  const pages = siteData.pages.filter(p => !p.isSection && p.title);
+  const pages = model.pages.filter(p => !p.isSection && p.title);
   let count = 0;
 
   for (const page of pages) {

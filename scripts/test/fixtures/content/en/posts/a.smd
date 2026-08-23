@@ -1,0 +1,8 @@
+---
+.title = "Post A",
+.date = .date("2026-02-01T00:00:00"),
+.tags = ["x"],
+.description = "First fixture post",
+---
+
+Some words here so the wordcount is above zero.

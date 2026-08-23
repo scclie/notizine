@@ -1,0 +1,9 @@
+---
+.title = "Note One",
+.date = .date("2026-02-01T00:00:00"),
+.layout = "page.shtml",
+.tags = ["notes"],
+.description = "First test note",
+---
+
+A first note to demonstrate multiple recents branches in the sidebar.

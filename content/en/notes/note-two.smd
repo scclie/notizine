@@ -1,0 +1,9 @@
+---
+.title = "Note Two",
+.date = .date("2026-02-02T00:00:00"),
+.layout = "page.shtml",
+.tags = ["notes"],
+.description = "Second test note",
+---
+
+A second note so the notes recents widget has something to list.
