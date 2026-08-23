@@ -1,0 +1,10 @@
+---
+.title = "Page not found",
+.date = .date("2026-01-01T00:00:00"),
+.description = "This motherfucking page does not exist",
+.layout = "page.shtml",
+---
+
+You hit a dead end. The page you asked for does not exist (or moved).
+
+Head back to the [start page](/) or try [search](/search/).

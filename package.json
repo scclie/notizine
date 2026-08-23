@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "node scripts/generate.mjs && zine",
     "build": "node scripts/build.mjs",
-    "preview": "npm run build && npx serve public"
+    "preview": "npm run build && node scripts/serve.mjs"
   },
   "dependencies": {
     "glob": "^11.0.0",

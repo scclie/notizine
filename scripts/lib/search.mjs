@@ -15,6 +15,7 @@ export function buildSearchIndex(model, root) {
   const byLocale = {};
   for (const p of model.pages) {
     if (p.isSection || !p.filePath) continue;
+    if (p.link.endsWith('/404/')) continue;
     const raw = readFileSync(p.filePath, 'utf-8');
     (byLocale[p.locale] ??= []).push({
       t: p.title,

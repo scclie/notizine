@@ -1,0 +1,61 @@
+---
+.title = "Config reference",
+.date = .date("2026-08-23T00:00:00"),
+.layout = "page.shtml",
+.tags = ["docs"],
+.description = "every option in notizine.ziggy",
+---
+
+everything lives in `assets/notizine.ziggy`. zine's own settings
+(domain, locales, site title) stay in `zine.ziggy`.
+
+# features
+
+each flag removes or restores a whole feature from the build output -
+disabled means the pages, links and scripts don't exist at all:
+
+- `recents` - `/recents/` page listing latest posts
+- `explorer` - `/explorer/` clickable tree of all pages
+- `search` - `/search/` client-side search over a prebuilt index
+- `darkmode` - theme toggle + `prefers-color-scheme` support
+- `translation_notice` - "auto-translated" banner on secondary locales
+- `tags` - `/tags/` tag index and per-tag pages
+- `breadcrumbs` - home / section / page chain above content
+- `og_images` - 1200x630 png social preview per page
+- `rss` - feeds + `<link rel=alternate>` discovery + footer link
+- `inline_mode` - inline css into each page instead of one external file
+
+# slots
+
+seven zones: `header`, `before_main`, `center`, `left`, `right`,
+`after_main`, `footer`. each zone is an ordered list of rows, modules in
+the same row sit side by side. an entry looks like:
+
+```zig
+{ "module": "_recents", "id": "docs", "section": "/notes/",
+  "title": "Docs", "count": 3, "align": "left", "show": ["date", "meta"] }
+```
+
+built-in modules start with `_`, custom ones use their directory name
+under `modules/`. an empty row `[]` hides the whole zone.
+
+# slots_overrides
+
+same structure, keyed by url prefix. all matching prefixes get merged,
+shortest first - so `/ru/search/` inherits everything configured for
+`/ru/` and adds its own center widget on top.
+
+# layout
+
+three-column css grid: `columns = [left, center, right]`. any column can
+be `"auto"` (size to content), `"hide"`, or fixed like `"240px"`. the
+window itself is sized by `width` (`min(70vw, 55rem)` keeps long lines
+readable on big monitors).
+
+# everything else
+
+- `analytics`, `plausible_domain` - paste a script url or plausible domain
+- `social.github` / `social.mastodon` - profile links in the footer
+- `fonts.heading/body/code`, `google_fonts` - typography without touching css
+- `custom_css` - path to an extra file in `assets/`
+- `og.*` - colors and text sizes of generated preview images

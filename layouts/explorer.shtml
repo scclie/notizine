@@ -7,6 +7,7 @@
     <h1 :text="$page.title"></h1>
     <ul>
       <ctx :loop="$site.index().subpages()">
+        <ctx :if='$loop.it.link().endsWith("404/").not()'>
         <li>
           <ctx :if="$loop.it.isSection()">
             <details open>
@@ -24,6 +25,7 @@
             <a href="$loop.it.link()" :text="$loop.it.title"></a>
           </ctx>
         </li>
+        </ctx>
       </ctx>
     </ul>
   </div>

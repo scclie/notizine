@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { cacheKey, homeLink } from './api.mjs';
@@ -62,6 +62,7 @@ export async function renderZones(model, i18n, root, modules, slots) {
               page,
               site: model,
               params: inst,
+              zone,
               i18n: i18n[page.locale] ?? (k => k),
             }) ?? '');
           } catch (e) {
@@ -75,6 +76,11 @@ export async function renderZones(model, i18n, root, modules, slots) {
       }
     }
     manifest[key] = pageManifest;
+  }
+  const validKeys = Object.keys(manifest).map(k => k.replace(/^\//, ''));
+  for (const entry of readdirSync(baseDir)) {
+    const alive = validKeys.some(k => k === entry || k.startsWith(entry + '/'));
+    if (!alive) rmSync(join(baseDir, entry), { recursive: true, force: true });
   }
   writeFileSync(join(root, 'assets', '.cache', 'zones-manifest.json'),
     JSON.stringify(manifest));

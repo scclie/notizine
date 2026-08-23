@@ -37,6 +37,9 @@
   <ctx :if="$site.asset('notizine.ziggy').ziggy().get('custom_css').len().gt(0)">
     <style :html="$site.asset($site.asset('notizine.ziggy').ziggy().get('custom_css')).bytes()"></style>
   </ctx>
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('rss')">
+    <link rel="alternate" type="application/rss+xml" :title="$site.page('posts').title.suffix(' · RSS')" :href="$site.page('posts').link().suffix('index.xml')">
+  </ctx>
   <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('og_images')">
     <meta property="og:title" content="$page.title">
     <meta property="og:description" content="$page.description">

@@ -1,0 +1,40 @@
+---
+.title = "Getting started",
+.date = .date("2026-08-23T00:00:00"),
+.layout = "page.shtml",
+.tags = ["docs"],
+.description = "install, run, deploy",
+---
+
+# prereqs
+
+you need [zine](https://zine-ssg.io) (ssg written in zig) and node 18+.
+easiest path is nix: run `nix-shell`, shell.nix brings everything (node,
+the zine binary, pillow for og images).
+
+no nix? grab nodejs, build zine from source, `pip install pillow`.
+
+# start
+
+```bash
+git clone https://codeberg.org/scclie/notizine.git my-site
+cd my-site
+npm install
+npm run dev      # localhost:1987
+```
+
+# make it yours
+
+1. `host_url` in zine.ziggy -> your real domain
+2. flip flags in assets/notizine.ziggy, see [config](/notes/config/)
+3. delete demo stuff in content/, or drop a locale from zine.ziggy
+4. move sidebar widgets around in slots, same file
+
+# ship it
+
+```bash
+npm run build    # output in public/
+```
+
+drop public/ on any static hosting: codeberg pages, github pages,
+nginx. `npm run preview` serves it locally with proper 404 fallback.

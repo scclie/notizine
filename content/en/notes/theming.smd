@@ -1,0 +1,48 @@
+---
+.title = "Theming",
+.date = .date("2026-08-23T00:00:00"),
+.layout = "page.shtml",
+.tags = ["docs"],
+.description = "themes, tokens and custom css",
+---
+
+pick a theme with `"theme"` in `assets/notizine.ziggy`:
+
+- `nord-default` - nord palette on the standard skeleton, the starter's
+  default
+- `everforest-default` - same skeleton in everforest colors: warm cream
+  light mode, deep green-grey dark mode
+- `sccl` - one centered window on a flat backdrop, space mono,
+  nord-inspired palette (this site uses it... well, used to)
+- `motherfuckingwebsite` - barely any css: system serif, single column,
+  default link colors. 4kb of styling total. want a catgirl pink theme
+  instead? it's just tokens, go wild
+
+# tokens
+
+themes are thin layers over the same css custom properties:
+
+```css
+:root {
+  --bg: #2e3440;         /* page backdrop */
+  --accent: #88c0d0;     /* links, highlights */
+  --page-width: min(70vw, 55rem);
+  /* ...borders, code background, tag colors, fonts... */
+}
+```
+
+override any of them via `custom_css` - point it at a file in `assets/`
+and it gets appended after the theme, before purging.
+
+# fonts
+
+no css needed for type: set `fonts.heading`, `fonts.body` or
+`fonts.code` to any font-family value, or use `google_fonts` with a
+query string like `"Inter:wght@400;700"`.
+
+# gotchas
+
+css is purged at build time - selectors that never appear in the final
+html get removed. if your custom styles target classes that only exist
+inside module output, make sure that module is actually slotted in, or
+the rules will be stripped.

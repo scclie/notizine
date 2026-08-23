@@ -41,19 +41,19 @@ for (const file of htmlFiles) {
 
 // Test: center slot renders content
 const indexHtml = readFileSync(join(PUBLIC, 'index.html'), 'utf-8');
-assert(indexHtml.includes('<p>Welcome'), 'Center slot renders content in index.html');
+assert(indexHtml.includes('is a starter'), 'Center slot renders content in index.html');
 
 const assetsJsonPath = join(process.cwd(), 'assets', '.cache', 'per-page-assets.json');
 assert(existsSync(assetsJsonPath), 'per-page-assets.json exists after build');
 
 // Test: page without companion files has no unwanted artifacts
-const postsHtml = readFileSync(join(PUBLIC, 'posts', 'hello-world', 'index.html'), 'utf-8');
+const postsHtml = readFileSync(join(PUBLIC, 'notes', 'getting-started', 'index.html'), 'utf-8');
 const injectedCount = (postsHtml.match(/per-page-assets/g) || []).length;
 assert(injectedCount === 0, 'Pages without companion files have no per-page-assets references');
 // 1. Content not duplicated (task-2: body text should appear exactly once)
-const helloHtml = readFileSync(join(PUBLIC, 'posts', 'hello-world', 'index.html'), 'utf-8');
-const bodyCount = (helloHtml.match(/Hello! This is an example post/g) || []).length;
-assert(bodyCount === 1, 'Content body not duplicated in post page');
+const helloHtml = readFileSync(join(PUBLIC, 'notes', 'getting-started', 'index.html'), 'utf-8');
+  const bodyCount = (helloHtml.match(/nix-shell/g) || []).length;
+assert(bodyCount === 1, 'Content body not duplicated in docs page');
 
 // 2. .recent-meta used instead of <time> for recents display
 const recentsHtml = readFileSync(join(PUBLIC, 'recents', 'index.html'), 'utf-8');
@@ -62,13 +62,13 @@ assert(recentMetaCount > 0, '.recent-meta present in output');
 
 // 3. per-page-assets.json has wordcount/readtime for a known page
 const assetsJson = JSON.parse(readFileSync(join(process.cwd(), 'assets', '.cache', 'per-page-assets.json'), 'utf-8'));
-const helloKey = '/posts/hello-world/';
+const helloKey = '/notes/getting-started/';
 assert(typeof assetsJson[helloKey].wordcount === 'number', 'Page has wordcount');
 assert(typeof assetsJson[helloKey].readtime === 'number', 'Page has readtime');
 
 // section.shtml renders subpages
-const postsSectionHtml = readFileSync(join(PUBLIC, 'posts', 'index.html'), 'utf-8');
-assert(postsSectionHtml.includes('Hello, World!'), 'Posts section lists subpages');
+const updatesSectionHtml = readFileSync(join(PUBLIC, 'updates', 'index.html'), 'utf-8');
+assert(updatesSectionHtml.includes('Module engine'), 'Updates section lists subpages');
 
 // _recents uses section-based filtering (no URL filter); scope to widget items
 // (explorer in the sidebar may legitimately link /tags/ and /search/)

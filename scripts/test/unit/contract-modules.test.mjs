@@ -111,11 +111,21 @@ test('social renders configured github and mastodon links only', async () => {
   assert.equal(empty, '');
 });
 
-test('rss_link follows features.rss and keeps the current feed link', async () => {
+test('rss_link follows features.rss and points at locale posts feed', async () => {
   const gen = await loadGen('rss_link');
-  assert.equal(await gen({ site: { config: { features: { rss: false } } } }), '');
-  assert.equal(await gen({ site: { config: { features: {} } } }), '');
-  assert.equal(await gen({ site: { config: { features: { rss: true } } } }), '<a href="/rss.xml" class="rss-link">RSS</a>');
+  const model = {
+    config: { features: { rss: true } },
+    pages: [
+      { locale: 'en', isSection: true, link: '/posts/' },
+      { locale: 'ru', isSection: true, link: '/ru/posts/' },
+    ],
+  };
+  const en = await gen({ page: { locale: 'en' }, site: model });
+  assert.equal(en, '<a href="/posts/index.xml" class="rss-link">RSS</a>');
+  const ru = await gen({ page: { locale: 'ru' }, site: model });
+  assert.equal(ru, '<a href="/ru/posts/index.xml" class="rss-link">RSS</a>');
+  assert.equal(await gen({ page: { locale: 'en' }, site: { config: { features: { rss: false } }, pages: model.pages } }), '');
+  assert.equal(await gen({ page: { locale: 'de' }, site: model }), '');
 });
 
 test('v2Slots no longer drops migrated sitewide or per-page modules', () => {

@@ -1,0 +1,25 @@
+---
+.title = "First public release",
+.date = .date("2026-07-01T00:00:00"),
+.layout = "page.shtml",
+.tags = ["release"],
+.description = "commit log of the initial drop",
+---
+
+initial drop, commit by commit:
+
+- `bd3f9de` initial: minimal viable product
+- `e07b8dc` n-lang dropdown (3+ locals)
+- `b6f1af0` rss
+- `3367039` breadcrumbs
+- `9424377` slot(modules) system
+- `befe62a` scaffold and css architecture
+- `09fe7c4` generate.mjs core engine
+- `543ea6c` module system with all built-in modules
+- `0e1865a` build orchestrator and purgecss integration
+- `a2efb8f` og images, cleanup, dev mode, rendering fix
+- `62e04f3` locale modules in scripty, inline_mode, theme js
+- `a73c963` image processing, bugfixes, smoke tests
+
+short version: cfg-driven slots, any number of locales, feeds, og
+images, purgecss in the pipeline.

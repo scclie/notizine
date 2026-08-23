@@ -1,0 +1,37 @@
+/* this is a motherfucking website theme. it's minimal as shit. */
+
+:root {
+  --bg: #fefefe;
+  --bg-alt: #f5f5f5;
+  --fg: #333;
+  --fg-muted: #777;
+  --text: #333;
+  --text-muted: #777;
+  --accent: blue;
+  --accent2: darkblue;
+  --accent3: teal;
+  --on-accent: #fff;
+  --border: #ccc;
+  --code-bg: #f5f5f5;
+  --tag-bg: #eee;
+  --tag-text: #333;
+}
+
+body {
+  max-width: 42em;
+  margin: 0 auto;
+  padding: 2em 1em;
+  font-family: Georgia, serif;
+  font-size: 1.1em;
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+a { color: var(--accent); }
+a:visited { color: purple; }
+h1, h2, h3, h4, h5, h6 { line-height: 1.1; }
+img { max-width: 100%; }
+code, pre { font-family: monospace; background: var(--code-bg); padding: 0 0.2em; }
+
+::selection { background: yellow; }

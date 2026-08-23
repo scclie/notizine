@@ -1,8 +1,8 @@
 ---
-.title = "Записи",
-.date = .date("2026-01-01T00:00:00"),
+.title = "Updates",
+.date = .date("2026-08-23T00:00:00"),
+.description = "Release notes and changelog",
 .layout = "section.shtml",
-.description = "Пример секции с записями",
 .alternatives = [
     .{
         .name = "rss",
@@ -12,3 +12,6 @@
     },
 ],
 ---
+
+what changed in notizine, newest first. rss badge in the footer if you
+want subs.

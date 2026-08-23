@@ -1,0 +1,55 @@
+---
+.title = "Writing content",
+.date = .date("2026-08-23T00:00:00"),
+.layout = "page.shtml",
+.tags = ["docs"],
+.description = "frontmatter, sections and rss in .smd files",
+---
+
+pages are [SuperMD](https://zine-ssg.io/docs/supermd/) (`.smd`) - markdown with a
+ziggy frontmatter block:
+
+```zig
+---
+.title = "My page",
+.date = .date("2026-08-23T10:00:00"),
+.description = "Shown in listings and OG images",
+.layout = "page.shtml",
+.tags = ["diary"],
+---
+```
+
+# sections
+
+a directory with an `index.smd` becomes a section. section indexes use
+`layout = "section.shtml"` and can attach feeds:
+
+```zig
+.alternatives = [
+    .{
+        .name = "rss",
+        .layout = "rss.xml",
+        .output = "index.xml",
+        .type = "application/rss+xml",
+    },
+],
+```
+
+that renders `index.xml` next to the section - exactly how the
+`/updates/` feed on this site works. with `features.rss` on, each feed
+also gets a discovery `<link>` in `<head>`.
+
+# translations
+
+mirrored pages live under matching paths in each locale dir
+(`content/en/foo.smd` <-> `content/ru/foo.smd`), the language switcher
+pairs them automatically. ui strings come from `i18n/<locale>.json`.
+pages missing a translation get a small notice banner unless you turn
+`translation_notice` off.
+
+# tips
+
+- `.tags` powers the `/tags/` index, any string works, spaces become
+  dashes in urls
+- reading time and word count are computed automatically for recents
+- dates drive ordering everywhere: recents widgets, prev/next, feeds
