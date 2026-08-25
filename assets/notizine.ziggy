@@ -85,7 +85,9 @@
     "columns": ["auto", "min(70vw, 55rem)", "auto"],  // left sidebar, main content, right sidebar
     "gap": "1.5rem",             // Gap between grid columns
     "width": "min(70vw, 55rem)",
-    "spacing": 1
+    "spacing": 1,
+    "left_width": "",            // Max width for left sidebar (e.g. "250px", "20vw"). Empty = no limit.
+    "right_width": ""            // Max width for right sidebar (e.g. "250px", "20vw"). Empty = no limit.
   },
 
   "slots_overrides": {

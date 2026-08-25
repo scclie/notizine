@@ -107,14 +107,14 @@ body {
 }
 
 .zone-left {
-  max-width: var(--col-left, 300px);
+  max-width: var(--sidebar-left-max, var(--col-left, 300px));
   width: 100%;
   justify-self: end;
   grid-column: 1;
 }
 
 .zone-right {
-  max-width: var(--col-right, 300px);
+  max-width: var(--sidebar-right-max, var(--col-right, 300px));
   width: 100%;
   justify-self: start;
   grid-column: 3;
