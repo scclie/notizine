@@ -24,15 +24,17 @@
           </ctx>
         </ctx>
       </ctx>
-      <ctx :if="$page.hasPrev().or($page.hasNext())">
-        <nav>
-          <ctx :if="$page.prevPage?()">
-            <a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a>
-          </ctx>
-          <ctx :if="$page.nextPage?()">
-            <a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a>
-          </ctx>
-        </nav>
+      <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('prev_next')">
+        <ctx :if="$page.hasPrev().or($page.hasNext())">
+          <nav>
+            <ctx :if="$page.prevPage?()">
+              <a href="$if.link()" :text="$i18n.get('previous_page').suffix(': ').suffix($if.title)"></a>
+            </ctx>
+            <ctx :if="$page.nextPage?()">
+              <a href="$if.link()" :text="$i18n.get('next_page').suffix(': ').suffix($if.title)"></a>
+            </ctx>
+          </nav>
+        </ctx>
       </ctx>
     </article>
   </div>

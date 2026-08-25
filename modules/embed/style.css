@@ -1,0 +1,10 @@
+.embed-container {
+  width: 100%;
+  margin: 1em 0;
+}
+
+.embed-container iframe {
+  display: block;
+  width: 100%;
+  background: var(--bg-secondary, #f5f5f5);
+}

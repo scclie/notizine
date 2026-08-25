@@ -1,0 +1,5 @@
+.{
+    .name = "embed",
+    .type = "dynamic",
+    .description = "Embed external content via iframe",
+}

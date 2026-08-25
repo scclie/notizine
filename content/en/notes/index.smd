@@ -1,8 +1,10 @@
 ---
-.title = "Notes",
-.date = .date("2026-02-01T00:00:00"),
-.description = "Short notes and sketches",
+.title = "Documentation",
+.date = .date("2026-08-23T00:00:00"),
+.description = "all doc pages, newest edits first",
 .layout = "section.shtml",
+.tags = ["docs"],
 ---
 
-A scratchpad section for quick thoughts.
+everything about notizine lives here. same pages are linked from the
+start page and the sidebar tree on the left.

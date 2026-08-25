@@ -1,0 +1,22 @@
+---
+.title = "Module engine and docs site",
+.date = .date("2026-08-23T00:00:00"),
+.layout = "page.shtml",
+.tags = ["release"],
+.description = "v2 pipeline, search index, themes, this site",
+---
+
+pipeline rewrite and this site. commits:
+
+- `bfada78` zine starter template: clean css, native api, compact
+  listings, dividers, theme sync
+- `05da50b` v2 generation pipeline with module engine and search index
+- `1568d0f` contract modules, layouts and multilingual content
+- `b38ce87` sccl and minimal themes with site config
+- `0bda7ca` docs site preview (this site), themes reworked:
+  nord-default as default, everforest-default, motherfuckingwebsite,
+  404 page, preview server with 404 fallback
+
+what you get on top of v1: instant client-side search over a build-time
+index (~4kb js), url-prefix slot overrides that merge cumulatively, and
+a fully cfg-driven layout.

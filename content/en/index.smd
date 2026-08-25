@@ -1,19 +1,20 @@
 ---
 .title = "notizine",
-.description = "A modular, multilingual static site starter built on Zine",
-.date = .date("2026-01-01T00:00:00"),
+.description = "modular multilingual static site starter on zine",
+.date = .date("2026-07-01T00:00:00"),
 .layout = "index.shtml",
 ---
 
-Welcome to **notizine** - a modular starter for [Zine](https://zine-ssg.io).
+**notizine** is a starter for [zine](https://zine-ssg.io). you edit one
+cfg file, write markdown, get a fast site with dark mode, instant
+search, tags and rss. locales are just folders - two, three, whatever.
 
-This is a demo site showing what you get out of the box:
-- **Multilingual** - RU and EN side by side, with a language switcher
-- **Sidebar** - recent posts and a full site tree, configured in a single file
-- **Dark mode** - respects your OS preference, toggle in the header
-- **Search, tags, breadcrumbs** - all optional, toggle on/off in config
+**[docs](/notes/)** - everything you need to run your own copy:
+install, every config option, module catalog, how content files work,
+theming. short pages, no fluff.
 
-To make this your own: edit `content/en/index.smd`, set your `host_url`
-in `zine.ziggy`, and customize `assets/notizine.ziggy`.
+**[updates](/updates/)** - the changelog, newest first. what shipped,
+what changed, what broke. rss feed attached if you want subs.
 
-See the [About](/about/) page for more.
+this site is built with notizine itself. clone the repo and you're 5
+minutes from your own version of it.

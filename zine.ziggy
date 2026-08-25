@@ -6,12 +6,6 @@
     .assets_dir_path = "assets",
     .locales = [
         .{
-            .code = "ru",
-            .name = "Русский",
-            .site_title = "notizine",
-            .content_dir_path = "content/ru",
-        },
-        .{
             .code = "en",
             .name = "English",
             .site_title = "notizine",

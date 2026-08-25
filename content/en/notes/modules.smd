@@ -1,0 +1,43 @@
+---
+.title = "Module catalog",
+.date = .date("2026-08-23T00:00:00"),
+.layout = "page.shtml",
+.tags = ["docs"],
+.description = "built-in widgets and how to write your own",
+---
+
+modules are the blocks you place into `slots`. each one is a directory
+under `modules/` with an optional `generator.mjs` (runs at build time,
+returns html), `client.js` (bundled into the site js) and `style.css`
+(merged and purged).
+
+# built-in
+
+- `_header` - site title linking home
+- `_theme_toggle` - light/dark switch
+- `_lang_nav` - locale switcher, shows only other locales
+- `_breadcrumbs` - home / section / page chain
+- `_content` - the page body itself, required in `center`
+- `_recents` - latest pages of a section + prev/next + random link;
+  params: `section`, `count`, `title`, `show`, `id`
+- `_explorer` - collapsible tree of every page
+- `_footer_text` - copyright line from config
+- `_rss_link` - rss badge when `features.rss` is on
+- `_back_to_top` - scroll-to-top button
+
+community modules without underscore: `badges` (88x31 buttons via
+`items`), `divider`, `prev_next`, `search`, `social`, `spacer`.
+
+# writing your own
+
+```
+modules/my-widget/
+  generator.mjs   export default async ({ page, site, params, i18n }) => html
+  client.js       plain script, bundled once per site
+  style.css       merged with site css, unused rules purged
+```
+
+`params` are whatever you wrote next to `"module"` in the slot entry, so
+one widget can be reused with different settings. need a module to act
+differently on specific pages? copy it to `modules/search@/ru/` - the
+suffix is a url-prefix override applied on top of base config.
