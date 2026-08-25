@@ -113,7 +113,7 @@
 
   // ── OG Image generation ──  Generate 1200×630 PNG for social previews.
   "og": {
-    "site_name": "notizine",    // Displayed at top-left of OG image
+    "site_name": "notizine",    // Displayed at top-left of OG image. Use \n for multi-line.
     "font_family": "system-ui, sans-serif",  // Font family for OG image text
     // Colors - Nord palette defaults
     "bg_top": "#2e3440",        // Gradient top

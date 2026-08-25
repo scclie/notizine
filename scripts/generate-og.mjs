@@ -57,6 +57,11 @@ export default async function generateOG({ config, model }) {
       ? `<text x="60" y="580" font-family="${font}" font-size="${sizes.date}px" fill="${colors.muted}">${date}</text>`
       : '';
 
+    const siteLines = siteName.split('\n').map((line, i) => {
+      const dy = i === 0 ? '' : ` dy="${sizes.site * 1.4}"`;
+      return `<tspan x="60"${dy}>${escapeXML(line)}</tspan>`;
+    }).join('');
+
     const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -66,7 +71,7 @@ export default async function generateOG({ config, model }) {
   </defs>
   ${bgRect}
   <rect x="0" y="0" width="8" height="${H}" fill="${colors.accent}"/>
-  <text x="60" y="80" font-family="${font}" font-size="${sizes.site}px" fill="${colors.muted}">${escapeXML(siteName)}</text>
+  <text x="60" y="80" font-family="${font}" font-size="${sizes.site}px" fill="${colors.muted}">${siteLines}</text>
   <text x="60" y="280" font-family="${font}" font-size="${sizes.title}px" fill="${colors.text}" font-weight="bold">${title}</text>
   ${descBlock}
   ${dateBlock}
