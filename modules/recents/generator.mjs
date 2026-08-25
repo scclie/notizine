@@ -1,4 +1,4 @@
-import { sectionLeaves, formatDate, esc, requireSection, siblingsOf } from '../../scripts/lib/api.mjs';
+import { sectionLeaves, formatDate, esc, requireSection, sectionSiblingsOf } from '../../scripts/lib/api.mjs';
 
 export default async function ({ page, site, params, i18n }) {
   const section = params.section ?? '/posts/';
@@ -20,10 +20,10 @@ export default async function ({ page, site, params, i18n }) {
   }).join('');
   const urls = esc(JSON.stringify(leaves.map(p => p.link)));
   const hidden = page.isSection || ['/recents/', '/tags/', '/search/', '/explorer/'].includes(page.link);
-  const ownBranch = page.parentLink === section;
+  const ownBranch = page.link.startsWith(section) || page.parentLink?.startsWith(section);
   let nav = '';
-  if (!hidden && ownBranch) {
-    const sibs = siblingsOf(site, page);
+  if (!hidden && ownBranch && site.config.features?.prev_next) {
+    const sibs = sectionSiblingsOf(site, page, section);
     const idx = sibs.findIndex(p => p.link === page.link);
     const prev = idx > 0 ? sibs[idx - 1] : null;
     const next = idx >= 0 && idx < sibs.length - 1 ? sibs[idx + 1] : null;

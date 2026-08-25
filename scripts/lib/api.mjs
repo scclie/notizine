@@ -16,6 +16,12 @@ export function siblingsOf(model, page) {
     .sort((x, y) => String(x.date).localeCompare(String(y.date)));
 }
 
+export function sectionSiblingsOf(model, page, section) {
+  return model.pages
+    .filter(p => p.locale === page.locale && !p.isSection && p.link.startsWith(section) && p.parentLink?.startsWith(section))
+    .sort((x, y) => String(x.date).localeCompare(String(y.date)));
+}
+
 export function childSections(model, localeCode, parentLink) {
   return model.pages
     .filter(p => p.locale === localeCode && p.isSection && p.parentLink === parentLink)

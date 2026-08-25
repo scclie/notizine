@@ -18,7 +18,8 @@
     "breadcrumbs": true,        // Home / Section / Page breadcrumb chain
     "og_images": true,          // 1200×630 PNG social preview images
     "rss": false,                // RSS feed + discovery link + footer button
-    "inline_mode": true         // Inline CSS into <style> (zero external CSS requests)
+    "inline_mode": true,        // Inline CSS into <style> (zero external CSS requests)
+    "prev_next": false          // Previous/Next post navigation in content
   },
   "language_primary": "en",     // Primary locale for i18n defaults
 
