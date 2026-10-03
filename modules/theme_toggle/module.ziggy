@@ -2,4 +2,10 @@
     .name = "_theme_toggle",
     .type = "builtin",
     .description = "Dark mode checkbox toggle",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+        .{ .source = "client.js", .delivery = "deferred", .output = "/assets/modules/theme-toggle.js" },
+    ],
+    .params = .{},
 }

@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
+import { parseZigRecord } from './module-manifest.mjs';
 
 function extractZiggyValue(fm, key) {
   const re = new RegExp('\\.' + key + '\\s*=\\s*(?:"([^"]*)"|([^,\n]+))');
@@ -38,6 +39,7 @@ function parseSMDFrontmatter(filePath, locale, baseDir, parentLink) {
   const raw = readFileSync(filePath, 'utf-8');
   const fmMatch = raw.match(/^---\n([\s\S]*?)\n---/);
   const fm = fmMatch ? fmMatch[1] : '';
+  const frontmatter = parseZigRecord(fm, `${filePath} frontmatter`);
   const relPath = relative(baseDir, dirname(filePath));
   const slug = basename(filePath, '.smd') === 'index'
     ? relPath
@@ -58,6 +60,8 @@ function parseSMDFrontmatter(filePath, locale, baseDir, parentLink) {
     parentLink,
     wordcount: stats.wordcount,
     readtime: stats.readtime,
+    meta: Object.fromEntries(Object.entries(frontmatter)
+      .filter(([key]) => !['title', 'description', 'date', 'moddate', 'tags'].includes(key))),
   };
 }
 

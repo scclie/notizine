@@ -2,4 +2,9 @@
     .name = "_social",
     .type = "dynamic",
     .description = "GitHub + Mastodon links",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+    ],
+    .params = .{},
 }

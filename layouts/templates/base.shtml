@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- notizine-performance:critical-shell:start -->
 <html lang="$site.localeCode()">
 <head id="head">
   <meta charset="utf-8">
@@ -12,7 +13,16 @@
   <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('inline_mode').not()">
     <link rel="stylesheet" href="$site.asset('css/generated.css').link()">
   </ctx>
-  <script :html="$site.asset('js/theme.js').bytes()"></script>
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('darkmode')">
+    <script :html="$site.asset('js/theme.js').bytes()"></script>
+  </ctx>
+  <ctx ma="$site.asset('.cache/page-assets.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+    <ctx :loop="$ctx.ma.get('localAssets')"><ctx asset="$site.asset($loop.it).link()"></ctx></ctx>
+    <ctx :html="$ctx.ma.get('criticalStyles')"></ctx>
+    <ctx :html="$ctx.ma.get('criticalScripts')"></ctx>
+    <ctx :html="$ctx.ma.get('deferredStyles')"></ctx>
+    <ctx :html="$ctx.ma.get('externalStyles')"></ctx>
+  </ctx>
   <ctx lk="$page.link().eql('/').then('index', $page.link())">
     <ctx :if="$site.asset('.cache/per-page-assets.json').ziggy().get($ctx.lk).get?('css')">
       <style :html="$site.asset('.cache/per-page-assets.json').ziggy().get($ctx.lk).get('css')"></style>
@@ -34,9 +44,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="$site.asset('notizine.ziggy').ziggy().get('google_fonts').prefix('https://fonts.googleapis.com/css2?family=').suffix('&display=swap')">
   </ctx>
-  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('custom_css').len().gt(0)">
-    <style :html="$site.asset($site.asset('notizine.ziggy').ziggy().get('custom_css')).bytes()"></style>
-  </ctx>
   <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('rss')">
     <link rel="alternate" type="application/rss+xml" :title="$site.page('posts').title.suffix(' · RSS')" :href="$site.page('posts').link().suffix('index.xml')">
   </ctx>
@@ -55,88 +62,117 @@
 </head>
 <body id="body">
   <div class="layout">
-    <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
-      <aside class="zone zone-left" id="zone-left" :if="$ctx.zm.get('left').len.gt(0)">
-        <ctx :loop="$ctx.zm.get('left')">
+    <div class="grid-cell grid-cell-top-left">
+      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+        <ctx :loop="$ctx.zm.get('top_left')">
           <ctx :if="$loop.it.len.gt(0)">
             <div class="slot-row"><ctx :loop="$loop.it">
               <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
             </ctx></div>
           </ctx>
         </ctx>
-      </aside>
-    </ctx>
-    <div class="zone zone-center" id="zone-center">
-      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
-        <header id="header">
-          <ctx :loop="$ctx.zm.get('header')">
-            <ctx :if="$loop.it.len.gt(0)">
-              <div class="slot-row"><ctx :loop="$loop.it">
-                <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
-              </ctx></div>
-            </ctx>
-          </ctx>
-        </header>
-        <ctx :loop="$ctx.zm.get('before_main')">
-          <ctx :if="$loop.it.len.gt(0)">
-            <div class="slot-row"><ctx :loop="$loop.it">
-              <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
-            </ctx></div>
-          </ctx>
-        </ctx>
-      </ctx>
-      <main id="content">
-        <super>
-        <div class="page-content" :html="$page.content()"></div>
-        <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
-          <ctx :loop="$ctx.zm.get('center')">
-            <ctx :if="$loop.it.len.gt(0)">
-              <div class="slot-row"><ctx :loop="$loop.it">
-                <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
-              </ctx></div>
-            </ctx>
-          </ctx>
-        </ctx>
-      </main>
-      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
-        <ctx :loop="$ctx.zm.get('after_main')">
-          <ctx :if="$loop.it.len.gt(0)">
-            <div class="slot-row"><ctx :loop="$loop.it">
-              <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
-            </ctx></div>
-          </ctx>
-        </ctx>
-      </ctx>
-      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
-        <footer id="footer" :if="$ctx.zm.get('footer').len.gt(0)">
-          <ctx :loop="$ctx.zm.get('footer')">
-            <ctx :if="$loop.it.len.gt(0)">
-              <div class="slot-row"><ctx :loop="$loop.it">
-                <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
-              </ctx></div>
-            </ctx>
-          </ctx>
-        </footer>
       </ctx>
     </div>
-    <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
-      <aside class="zone zone-right" id="zone-right" :if="$ctx.zm.get('right').len.gt(0)">
-        <ctx :loop="$ctx.zm.get('right')">
+    <header class="grid-cell grid-cell-top-center" id="header">
+      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+        <ctx :loop="$ctx.zm.get('top_center')">
           <ctx :if="$loop.it.len.gt(0)">
             <div class="slot-row"><ctx :loop="$loop.it">
               <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
             </ctx></div>
           </ctx>
         </ctx>
-      </aside>
-    </ctx>
+      </ctx>
+    </header>
+    <div class="grid-cell grid-cell-top-right">
+      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+        <ctx :loop="$ctx.zm.get('top_right')">
+          <ctx :if="$loop.it.len.gt(0)">
+            <div class="slot-row"><ctx :loop="$loop.it">
+              <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
+            </ctx></div>
+          </ctx>
+        </ctx>
+      </ctx>
+    </div>
+    <aside class="grid-cell grid-cell-middle-left">
+      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+        <ctx :loop="$ctx.zm.get('middle_left')">
+          <ctx :if="$loop.it.len.gt(0)">
+            <div class="slot-row"><ctx :loop="$loop.it">
+              <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
+            </ctx></div>
+          </ctx>
+        </ctx>
+      </ctx>
+    </aside>
+    <main class="grid-cell grid-cell-middle-center" id="content">
+      <!-- notizine-performance:page-body:start -->
+      <super>
+      <div class="page-content" :html="$page.content()"></div>
+      <!-- notizine-performance:page-body:end -->
+      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+        <ctx :loop="$ctx.zm.get('middle_center')">
+          <ctx :if="$loop.it.len.gt(0)">
+            <div class="slot-row"><ctx :loop="$loop.it">
+              <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
+            </ctx></div>
+          </ctx>
+        </ctx>
+      </ctx>
+    </main>
+    <aside class="grid-cell grid-cell-middle-right">
+      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+        <ctx :loop="$ctx.zm.get('middle_right')">
+          <ctx :if="$loop.it.len.gt(0)">
+            <div class="slot-row"><ctx :loop="$loop.it">
+              <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
+            </ctx></div>
+          </ctx>
+        </ctx>
+      </ctx>
+    </aside>
+    <div class="grid-cell grid-cell-bottom-left">
+      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+        <ctx :loop="$ctx.zm.get('bottom_left')">
+          <ctx :if="$loop.it.len.gt(0)">
+            <div class="slot-row"><ctx :loop="$loop.it">
+              <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
+            </ctx></div>
+          </ctx>
+        </ctx>
+      </ctx>
+    </div>
+    <footer class="grid-cell grid-cell-bottom-center" id="footer">
+      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+        <ctx :loop="$ctx.zm.get('bottom_center')">
+          <ctx :if="$loop.it.len.gt(0)">
+            <div class="slot-row"><ctx :loop="$loop.it">
+              <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
+            </ctx></div>
+          </ctx>
+        </ctx>
+      </ctx>
+    </footer>
+    <div class="grid-cell grid-cell-bottom-right">
+      <ctx pk="$page.link().eql('/').then('/index/', $page.link())" zm="$site.asset('.cache/zones-manifest.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+        <ctx :loop="$ctx.zm.get('bottom_right')">
+          <ctx :if="$loop.it.len.gt(0)">
+            <div class="slot-row"><ctx :loop="$loop.it">
+              <div class="$loop.it.get('align').prefix('align-')" :html="$site.asset($ctx.pk.prefix('.cache/zones').suffix($loop.it.get('file'))).bytes()"></div>
+            </ctx></div>
+          </ctx>
+        </ctx>
+      </ctx>
+    </div>
   </div>
-  <script defer src="$site.asset('.cache/search.js').link()"></script>
-  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('inline_mode')">
-    <script :html="$site.asset('.cache/all.js').bytes()"></script>
+  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('search')">
+    <script defer src="$site.asset('.cache/search.js').link()"></script>
   </ctx>
-  <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('inline_mode').not()">
-    <script defer src="$site.asset('.cache/all.js').link()"></script>
+  <ctx ma="$site.asset('.cache/page-assets.json').ziggy().get($page.link().eql('/').then('index', $page.link()))">
+    <ctx :html="$ctx.ma.get('deferredScripts')"></ctx>
+    <ctx :html="$ctx.ma.get('externalScripts')"></ctx>
   </ctx>
 </body>
 </html>
+<!-- notizine-performance:critical-shell:end -->

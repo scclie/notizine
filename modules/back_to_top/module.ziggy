@@ -2,4 +2,9 @@
     .name = "_back_to_top",
     .type = "static",
     .description = "Back to top link",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "client.js", .delivery = "deferred", .output = "/assets/modules/back-to-top.js" },
+    ],
+    .params = .{},
 }

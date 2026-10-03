@@ -4,10 +4,18 @@ export function renderTokens(config) {
   const k = L.spacing ?? 1;
   const lines = [':root {'];
   SCALE.forEach((s, i) => lines.push(`--sp-${i + 1}: ${(s * k).toFixed(3)}rem;`));
-  lines.push(`--col-gap: ${L.gap ?? '1.5rem'};`);
-  lines.push(`--page-width: ${L.width ?? '720px'};`);
   const cols = L.columns ?? ['auto', '720px', 'auto'];
-  lines.push(`--col-left: ${cols[0]};`, `--col-right: ${cols[cols.length - 1]};`);
+  const rows = L.rows ?? ['auto', '1fr', 'auto'];
+  lines.push(
+    `--grid-col-1: ${cols[0]};`,
+    `--grid-col-2: ${cols[1]};`,
+    `--grid-col-3: ${cols[2]};`,
+    `--grid-row-1: ${rows[0]};`,
+    `--grid-row-2: ${rows[1]};`,
+    `--grid-row-3: ${rows[2]};`,
+    `--grid-gap: ${L.gap ?? '1.5rem'};`
+  );
+  lines.push(`--page-width: ${L.width ?? cols[1]};`);
   lines.push(`--sidebar-left-max: ${L.left_width || '300px'};`);
   lines.push(`--sidebar-right-max: ${L.right_width || '300px'};`);
   for (const part of ['body', 'heading', 'code']) {

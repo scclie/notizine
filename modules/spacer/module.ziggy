@@ -2,4 +2,7 @@
     .name = "_spacer",
     .type = "static",
     .description = "Flex spacer for push-layout",
+    .delivery = "critical",
+    .assets = [],
+    .params = .{},
 }

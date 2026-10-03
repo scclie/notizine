@@ -2,4 +2,12 @@
     .name = "_explorer",
     .type = "builtin",
     .description = "Site tree explorer (sections + pages)",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+    ],
+    .params = .{
+        .root = .{ .type = "string", .default = "/" },
+        .exclude = .{ .type = "array", .items = .{ .type = "string" }, .default = [] },
+    },
 }

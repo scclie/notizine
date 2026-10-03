@@ -22,52 +22,57 @@ export default async function purge(publicDir) {
   const htmlFiles = findAllHTML(publicDir);
   console.log(`[purge] Processing ${htmlFiles.length} files...`);
 
+  const htmlByFile = htmlFiles.map(file => {
+    const html = readFileSync(file, 'utf-8');
+    return {
+      file,
+      html,
+      content: html.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ''),
+    };
+  });
   let totalBefore = 0, totalAfter = 0;
-  const linkedFiles = [];
 
-  for (const file of htmlFiles) {
-    let html = readFileSync(file, 'utf-8');
+  for (const page of htmlByFile) {
+    const styles = [...page.html.matchAll(/(<style\b[^>]*>)([\s\S]*?)(<\/style>)/gi)];
+    if (styles.length === 0) continue;
 
-    const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/);
-    if (!styleMatch) {
-      linkedFiles.push(file);
-      continue;
+    let offset = 0;
+    let html = page.html;
+    for (const style of styles) {
+      const [full, openTag, originalCSS, closeTag] = style;
+      totalBefore += originalCSS.length;
+      const purgeResults = await new PurgeCSS().purge({
+        content: [{ raw: page.content, extension: 'html' }],
+        css: [{ raw: originalCSS }],
+        safelist: SAFELIST,
+        defaultExtractor: EXTRACTOR,
+      });
+      const minified = minifyCSS(purgeResults[0]?.css || originalCSS);
+      totalAfter += minified.length;
+      const replacement = `${openTag}${minified}${closeTag}`;
+      const start = style.index + offset;
+      html = html.slice(0, start) + replacement + html.slice(start + full.length);
+      offset += replacement.length - full.length;
     }
-
-    const originalCSS = styleMatch[1];
-    totalBefore += originalCSS.length;
-
-    const purgeResults = await new PurgeCSS().purge({
-      content: [{ raw: html, extension: 'html' }],
-      css: [{ raw: originalCSS }],
-      safelist: SAFELIST,
-      defaultExtractor: EXTRACTOR,
-    });
-
-    const purged = purgeResults[0]?.css || originalCSS;
-    const minified = minifyCSS(purged);
-    totalAfter += minified.length;
-
-    html = html.replace(styleMatch[0], `<style>${minified}</style>`);
-    writeFileSync(file, html);
+    writeFileSync(page.file, html);
   }
 
   const saved = totalBefore - totalAfter;
   console.log(`[purge] CSS: ${(totalBefore/1024).toFixed(1)}KB -> ${(totalAfter/1024).toFixed(1)}KB (saved ${(saved/1024).toFixed(1)}KB)`);
 
-  const linkedSaved = await purgeGenerated(publicDir, linkedFiles);
-  if (linkedFiles.length > 0) {
-    console.log(`[purge] generated.css: purged against ${linkedFiles.length} linked files (saved ${(linkedSaved/1024).toFixed(1)}KB)`);
+  const linkedSaved = await purgeGenerated(publicDir, htmlByFile);
+  if (htmlByFile.length > 0) {
+    console.log(`[purge] generated.css: purged against ${htmlByFile.length} files (saved ${(linkedSaved/1024).toFixed(1)}KB)`);
   }
 }
 
-async function purgeGenerated(publicDir, htmlFiles) {
-  if (htmlFiles.length === 0) return 0;
+async function purgeGenerated(publicDir, htmlPages) {
+  if (htmlPages.length === 0) return 0;
   const cssPath = join(publicDir, 'assets', 'css', 'generated.css');
   if (!existsSync(cssPath)) return 0;
   const originalCSS = readFileSync(cssPath, 'utf-8');
-  const content = htmlFiles.map(file => ({
-    raw: readFileSync(file, 'utf-8'),
+  const content = htmlPages.map(({ content: html }) => ({
+    raw: html,
     extension: 'html',
   }));
   const purgeResults = await new PurgeCSS().purge({

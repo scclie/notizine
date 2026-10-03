@@ -1,14 +1,15 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { join, dirname, relative, basename, extname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { default as generateOG } from './generate-og.mjs';
-import { loadConfig, syncZineConfig, stripZiggy } from './lib/config.mjs';
+import { loadConfig, stripZiggy } from './lib/config.mjs';
 import { buildModel } from './lib/model.mjs';
-import { buildSearchIndex } from './lib/search.mjs';
+import { buildSearchIndex, removeSearchIndex } from './lib/search.mjs';
 import { discoverModules, resolveSlots } from './lib/modules.mjs';
 import { loadI18n } from './lib/i18n.mjs';
 import { bundleCSS } from './lib/css.mjs';
-import { renderZones, bundleClient, v2Slots } from './lib/render.mjs';
+import { buildPageAssets, writePageAssets } from './lib/module-assets.mjs';
+import { renderZones } from './lib/render.mjs';
 
 const ROOT = process.cwd();
 const CACHE_DIR = join(ROOT, 'assets', '.cache', 'modules');
@@ -18,6 +19,42 @@ const MODULES_DIR = join(ROOT, 'modules');
 const I18N_DIR = join(ROOT, 'i18n');
 const CONTENT_DIR = join(ROOT, 'content');
 const ZINE_CONFIG_PATH = join(ROOT, 'zine.ziggy');
+
+const FEATURE_MODULES = {
+  search: 'search',
+  darkmode: '_theme_toggle',
+};
+
+function featureEnabled(config, feature) {
+  return config.features?.[feature] === true;
+}
+
+function enabledFeatureInstances(config, instances) {
+  return instances.filter(instance => !Object.entries(FEATURE_MODULES)
+    .some(([feature, module]) => instance.module === module && !featureEnabled(config, feature)));
+}
+
+function withoutDisabledFeatureModules(config) {
+  const filterRows = rows => rows.map(row => enabledFeatureInstances(config, row));
+  return {
+    ...config,
+    slots: Object.fromEntries(Object.entries(config.slots ?? {}).map(([zone, rows]) => [zone, filterRows(rows)])),
+    slots_overrides: Object.fromEntries(Object.entries(config.slots_overrides ?? {}).map(([page, zones]) => [
+      page,
+      Object.fromEntries(Object.entries(zones).map(([zone, rows]) => [zone, filterRows(rows)])),
+    ])),
+  };
+}
+
+function removeDisabledFeatureAssets(config) {
+  if (!featureEnabled(config, 'search')) {
+    removeSearchIndex(ROOT);
+    rmSync(join(ROOT, 'assets', 'assets', 'modules', 'search.js'), { force: true });
+  }
+  if (!featureEnabled(config, 'darkmode')) {
+    rmSync(join(ROOT, 'assets', 'assets', 'modules', 'theme-toggle.js'), { force: true });
+  }
+}
 
 function legacyReadConfig() {
   const raw = readFileSync(CONFIG_PATH, 'utf-8');
@@ -325,23 +362,29 @@ function computeStats(rawContent) {
 async function newGenerate() {
   console.log('[generate] Starting pre-generation...');
   const config = loadConfig(ROOT);
-  syncZineConfig(config, ROOT);
   const model = buildModel(config, ROOT);
-  buildSearchIndex(model, ROOT);
+  if (featureEnabled(config, 'search')) buildSearchIndex(model, ROOT);
+  removeDisabledFeatureAssets(config);
   writePerPageAssets(model.pages);
   await generateOG({ config, model });
   const modules = discoverModules(ROOT);
-  const slots = resolveSlots({ ...config, slots: v2Slots(config.slots) }, modules);
+  const renderConfig = withoutDisabledFeatureModules(config);
+  const slots = resolveSlots(renderConfig, modules);
   const i18n = loadI18n(ROOT);
-  const installed = await renderZones(model, i18n, ROOT, modules, slots);
-  const overrideModules = Object.values(config.slots_overrides ?? {})
-    .flatMap(zm => Object.values(zm)).flat(2)
-    .map(r => r?.module).filter(Boolean);
-  const usedModules = [...new Set([
-    ...Object.values(slots.zones).flat(2).map(r => r?.module).filter(Boolean),
-    ...overrideModules,
-  ])];
-  bundleClient(installed, usedModules, ROOT);
+  const rendered = await renderZones({ ...model, config: renderConfig }, i18n, ROOT, modules, slots);
+  const pageAssets = Object.fromEntries(Object.entries(rendered.pageInstances).map(([pageKey, instances]) => [
+    pageKey,
+    buildPageAssets({
+      pageKey,
+      instances: enabledFeatureInstances(config, instances),
+      modules,
+      root: ROOT,
+      includeCriticalStyles: false,
+    }),
+  ]));
+  writePageAssets(pageAssets, ROOT);
+  const installed = new Set([...rendered.installed].filter(module => !Object.entries(FEATURE_MODULES)
+    .some(([feature, featureModule]) => module === featureModule && !featureEnabled(config, feature))));
   bundleCSS(config, installed, ROOT);
   console.log('[generate] Done.');
 }

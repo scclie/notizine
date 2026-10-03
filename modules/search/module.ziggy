@@ -2,4 +2,10 @@
     .name = "search",
     .type = "builtin",
     .description = "Client-side title search over the site model",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+        .{ .source = "client.js", .delivery = "deferred", .output = "/assets/modules/search.js" },
+    ],
+    .params = .{},
 }

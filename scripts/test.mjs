@@ -43,6 +43,16 @@ for (const file of htmlFiles) {
 const indexHtml = readFileSync(join(PUBLIC, 'index.html'), 'utf-8');
 assert(indexHtml.includes('is a starter'), 'Center slot renders content in index.html');
 
+const gridCells = [
+  'top-left', 'top-center', 'top-right',
+  'middle-left', 'middle-center', 'middle-right',
+  'bottom-left', 'bottom-center', 'bottom-right',
+];
+for (const cell of gridCells) {
+  assert(indexHtml.includes(`grid-cell-${cell}`), `grid-cell-${cell} renders in index.html`);
+}
+assert(!/\bzone-(left|center|right)\b/.test(indexHtml), 'No legacy structural zone classes render in index.html');
+
 const assetsJsonPath = join(process.cwd(), 'assets', '.cache', 'per-page-assets.json');
 assert(existsSync(assetsJsonPath), 'per-page-assets.json exists after build');
 
@@ -69,6 +79,9 @@ assert(typeof assetsJson[helloKey].readtime === 'number', 'Page has readtime');
 // section.shtml renders subpages
 const updatesSectionHtml = readFileSync(join(PUBLIC, 'updates', 'index.html'), 'utf-8');
 assert(updatesSectionHtml.includes('Module engine'), 'Updates section lists subpages');
+
+const postsSectionHtml = readFileSync(join(PUBLIC, 'posts', 'index.html'), 'utf-8');
+assert(postsSectionHtml.includes('Posts'), 'Section without custom.view renders through section.shtml');
 
 // _recents uses section-based filtering (no URL filter); scope to widget items
 // (explorer in the sidebar may legitimately link /tags/ and /search/)

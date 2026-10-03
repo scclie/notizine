@@ -22,6 +22,12 @@
     "prev_next": false,         // Previous/Next post navigation in content
     "mermaid": false            // Render mermaid diagrams at build time (requires mermaid-cli)
   },
+
+  // ── Performance ── Static HTML gzip audit policy.
+  "performance": {
+    "critical_html_gzip_budget": "14kb",
+    "on_budget_exceeded": "warn"
+  },
   "language_primary": "en",     // Primary locale for i18n defaults
 
   // ── Analytics & Comments ──
@@ -37,9 +43,9 @@
   },
 
   // ── Slots (module system) ──
-  // Seven zones: header, before_main, center, left, right, after_main, footer.
-  // Each zone is an ordered list of ROWS. Each row is an array of module entries.
-  // Modules in the same row appear next to each other in a flex row.
+  // Nine 3×3 grid cells, each an ordered list of ROWS. Modules in the same row
+  // appear next to each other in a flex row. The page body is implicit in
+  // middle_center; do not configure _content.
   //
   // Module entry fields:
   //   "module": module name (built-in start with _, custom use directory name)
@@ -47,44 +53,43 @@
   //   "section": section name for _recents / _explorer (e.g. "posts")
   //
   // Built-in modules: _header, _theme_toggle, _lang_nav, _spacer,
-  //   _breadcrumbs, _recents, _explorer, _footer_text, _back_to_top, _content
+  //   _breadcrumbs, _recents, _explorer, _footer_text, _back_to_top
   //
   // Example: [{ "module": "_recents", "section": "posts", "show": ["date", "meta"] }]
-  // Empty array [] = zone hidden.
+  // Empty array [] = an empty grid cell.
   "slots": {
-    "header": [],
-    "before_main": [
+    "top_left": [],
+    "top_center": [
       [{ "module": "divider" }],
       [{ "module": "_breadcrumbs" }]
     ],
-    "center": [
-      [{ "module": "_content" }]
-    ],
+    "top_right": [],
     // Left: site title + theme toggle above the documentation tree; Right: updates feed
-    "left": [
+    "middle_left": [
       [{ "module": "_header", "site_title": "notizine" },{ "module": "_theme_toggle" }],
       [{ "module": "_explorer", "root": "/notes/" }]
     ],
-    "right": [
+    "middle_center": [],
+    "middle_right": [
       [{ "module": "_recents", "id": "_recents_updates", "section": "/updates/", "title": "Updates", "count": 3, "show": ["date"] }]
     ],
-    "after_main": [],
-    "footer": [
+    "bottom_left": [],
+    "bottom_center": [
       [{ "module": "divider" }],
       [{ "module": "badges", "align": "center" }],
       [{ "module": "_footer_text", "align": "center" }],
       [{ "module": "_rss_link", "align": "center" }],
       [{ "module": "_back_to_top", "align": "center" }]
-    ]
+    ],
+    "bottom_right": []
   },
 
   // ── Layout ──
   "layout": {
-    // Three-column CSS Grid.
-    // Column 1 = left sidebar, 2 = center (main content), 3 = right sidebar.
-    // "auto" = show, "hide" = hidden, "200px" = fixed width.
-    "columns": ["auto", "min(70vw, 55rem)", "auto"],  // left sidebar, main content, right sidebar
-    "gap": "1.5rem",             // Gap between grid columns
+    // Three-column, three-row CSS Grid tracks: left/center/right and top/middle/bottom.
+    "columns": ["auto", "min(70vw, 55rem)", "auto"],
+    "rows": ["auto", "1fr", "auto"],
+    "gap": "1.5rem",             // Gap between grid tracks
     "width": "min(70vw, 55rem)",
     "spacing": 1,
     "left_width": "",            // Max width for left sidebar (e.g. "250px", "20vw"). Empty = no limit.
@@ -92,7 +97,17 @@
   },
 
   "slots_overrides": {
-    "/search/": { "center": [ [ { "module": "search", "id": "search" } ] ] }
+    "/search/": {
+      "top_left": [],
+      "top_center": [],
+      "top_right": [],
+      "middle_left": [],
+      "middle_center": [[{ "module": "search", "id": "search" }]],
+      "middle_right": [],
+      "bottom_left": [],
+      "bottom_center": [],
+      "bottom_right": []
+    }
   },
 
   // ── Custom CSS ──

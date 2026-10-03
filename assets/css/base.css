@@ -15,44 +15,50 @@ body {
 
 .layout {
   display: grid;
-  grid-template-columns: var(--col-left, 1fr) var(--page-width, 720px) var(--col-right, 1fr);
-  gap: var(--col-gap, 1.5rem);
+  grid-template-columns: var(--grid-col-1) var(--grid-col-2) var(--grid-col-3);
+  grid-template-rows: var(--grid-row-1) var(--grid-row-2) var(--grid-row-3);
+  grid-template-areas:
+    "top-left top-center top-right"
+    "middle-left middle-center middle-right"
+    "bottom-left bottom-center bottom-right";
+  gap: var(--grid-gap);
   justify-items: center;
 }
 
-.zone-center {
+.grid-cell { min-width: 0; }
+
+.grid-cell-top-left { grid-area: top-left; }
+.grid-cell-top-center { grid-area: top-center; }
+.grid-cell-top-right { grid-area: top-right; }
+.grid-cell-middle-left { grid-area: middle-left; }
+.grid-cell-middle-center { grid-area: middle-center; }
+.grid-cell-middle-right { grid-area: middle-right; }
+.grid-cell-bottom-left { grid-area: bottom-left; }
+.grid-cell-bottom-center { grid-area: bottom-center; }
+.grid-cell-bottom-right { grid-area: bottom-right; }
+
+.grid-cell-top-center,
+.grid-cell-middle-center,
+.grid-cell-bottom-center {
   width: 100%;
   max-width: var(--page-width, 720px);
-  min-width: 0;
-  grid-column: 2;
 }
 
-.zone-left {
+.grid-cell-middle-left {
   width: var(--sidebar-left-max, 300px);
   min-width: var(--sidebar-left-max, 300px);
   max-width: var(--sidebar-left-max, 300px);
   justify-self: end;
-  grid-column: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 }
 
-.zone-right {
+.grid-cell-middle-right {
   width: var(--sidebar-right-max, 300px);
   min-width: var(--sidebar-right-max, 300px);
   max-width: var(--sidebar-right-max, 300px);
   justify-self: start;
-  grid-column: 3;
-}
-
-.zone-left:empty,
-.zone-right:empty {
-  display: none;
-}
-
-.zone-right {
-  display: var(--right-display, block);
 }
 
 .slot-row {
@@ -331,21 +337,31 @@ a.tag, .tag {
 
   .layout {
     grid-template-columns: 1fr;
+    grid-template-rows: repeat(9, auto);
+    grid-template-areas:
+      "top-left"
+      "top-center"
+      "top-right"
+      "middle-left"
+      "middle-center"
+      "middle-right"
+      "bottom-left"
+      "bottom-center"
+      "bottom-right";
     max-width: 100%;
   }
 
-  .zone-left {
-    grid-column: 1;
+  .grid-cell-top-center,
+  .grid-cell-middle-center,
+  .grid-cell-bottom-center,
+  .grid-cell-middle-left,
+  .grid-cell-middle-right {
     max-width: 100%;
+  }
+
+  .grid-cell-middle-left {
     justify-self: start;
-    order: 2;
     align-items: stretch;
-  }
-
-  .zone-center {
-    grid-column: 1;
-    max-width: 100%;
-    order: 1;
   }
 
   #footer {

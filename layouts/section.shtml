@@ -13,7 +13,7 @@
     <ctx :if="$page.content().len().gt(0)">
       <div :html="$page.content()"></div>
     </ctx>
-    <ctx :if="$page.custom.get?('view').eql('flat')">
+    <ctx :if="$page.custom.getOr('view', '').eql('flat')">
       <ctx :if="$page.leaves().len().gt(0)">
         <ctx :loop="$page.leaves()">
           <article>
@@ -30,7 +30,7 @@
         </ctx>
       </ctx>
     </ctx>
-    <ctx :if="$page.custom.get?('view').eql('flat').not()">
+    <ctx :if="$page.custom.getOr('view', '').eql('flat').not()">
       <ctx :if="$page.subpages().len.gt(0)">
         <ctx :loop="$page.subpages()">
           <ctx :if="$loop.it.isSection().not()">

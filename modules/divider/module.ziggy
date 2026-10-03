@@ -2,4 +2,9 @@
     .name = "divider",
     .type = "static",
     .description = "Horizontal rule separator",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+    ],
+    .params = .{},
 }

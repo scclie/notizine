@@ -1,7 +1,6 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { discoverModules, resolveSlots } from './modules.mjs';
-import { v2Slots } from './render.mjs';
 import { renderTokens } from './tokens.mjs';
 
 function orderedModuleNames(config, modules, installed) {
@@ -32,14 +31,19 @@ function orderedModuleNames(config, modules, installed) {
 
 export function bundleCSS(config, installedModules, root) {
   const modules = discoverModules(root);
-  const normalized = { ...config, slots: v2Slots(config.slots) };
   const parts = [renderTokens(config)];
   parts.push(readFileSync(join(root, 'assets', 'css', 'base.css'), 'utf-8'));
   parts.push(readFileSync(join(root, 'assets', 'css', 'code.css'), 'utf-8'));
   parts.push(readFileSync(join(root, 'assets', 'themes', `${config.theme}.css`), 'utf-8'));
-  for (const name of orderedModuleNames(normalized, modules, installedModules)) {
-    const stylePath = join(modules[name].dir, 'style.css');
-    if (existsSync(stylePath)) parts.push(readFileSync(stylePath, 'utf-8'));
+  const seenStyles = new Set();
+  for (const name of orderedModuleNames(config, modules, installedModules)) {
+    for (const asset of modules[name].assets) {
+      if (asset.delivery !== 'critical' || !asset.source.endsWith('.css')) continue;
+      const stylePath = join(modules[name].dir, asset.source);
+      if (!existsSync(stylePath) || seenStyles.has(stylePath)) continue;
+      seenStyles.add(stylePath);
+      parts.push(readFileSync(stylePath, 'utf-8'));
+    }
   }
   if (config.custom_css) {
     parts.push(readFileSync(join(root, 'assets', config.custom_css), 'utf-8'));

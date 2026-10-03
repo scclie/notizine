@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildModel } from '../../lib/model.mjs';
@@ -52,4 +53,29 @@ test('pages get locale code prefix without output_prefix_override', () => {
   const model = buildModel(cfgRu, fixtureRoot);
   assert.ok(model.pages.some(p => p.link === '/ru/about/'));
   assert.ok(model.pages.some(p => p.link === '/ru/posts/b/'));
+});
+
+test('pages preserve arbitrary parsed frontmatter under meta', () => {
+  const root = '/tmp/opencode/notizine-model-meta';
+  const content = join(root, 'content', 'en');
+  mkdirSync(content, { recursive: true });
+  writeFileSync(join(content, 'post.smd'), `---
+.title = "Metadata post",
+.shitpostness = "maximum",
+.rating = 11,
+.flags = ["loud", "unserious"],
+---
+
+Content.`);
+  const model = buildModel({ site: { locales: [
+    { code: 'en', content_dir_path: 'content/en', output_prefix_override: '' },
+  ] } }, root);
+  const page = model.pages.find(item => item.link === '/post/');
+
+  assert.equal(page.title, 'Metadata post');
+  assert.deepEqual(page.meta, {
+    shitpostness: 'maximum',
+    rating: 11,
+    flags: ['loud', 'unserious'],
+  });
 });

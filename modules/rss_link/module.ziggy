@@ -2,4 +2,9 @@
     .name = "_rss_link",
     .type = "dynamic",
     .description = "RSS feed button",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+    ],
+    .params = .{},
 }

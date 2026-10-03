@@ -88,17 +88,17 @@ html {
   max-width: none;
 }
 
-.zone-center {
+.grid-cell-middle-center {
   background: var(--bg-alt);
   border: 2px solid var(--accent);
   padding: var(--sp-4, 1rem) var(--sp-5, 1.25rem);
 }
 
-.zone-left {
+.grid-cell-middle-left {
   display: block;
 }
 
-.zone-right {
+.grid-cell-middle-right {
   padding-left: 0.25rem;
 }
 
@@ -263,20 +263,12 @@ a.tag:hover, .tag:hover {
 }
 
 @media (max-width: 768px) {
-  .zone-center {
+  .grid-cell-middle-center {
     padding: var(--sp-3, 0.75rem);
   }
 
-  .zone-left,
-  .zone-right {
+  .grid-cell-middle-left,
+  .grid-cell-middle-right {
     max-width: 100%;
-  }
-
-  .zone-left {
-    order: 2;
-  }
-
-  .zone-right {
-    order: 3;
   }
 }

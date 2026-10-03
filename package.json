@@ -7,7 +7,14 @@
   "scripts": {
     "dev": "node scripts/generate.mjs && zine",
     "build": "node scripts/build.mjs",
-    "preview": "npm run build && node scripts/serve.mjs"
+    "preview": "npm run build && node scripts/serve.mjs",
+    "validate": "node scripts/validate.mjs",
+    "sync:zine": "node scripts/sync-zine-config.mjs",
+    "audit:performance": "node scripts/audit-performance.mjs",
+    "test:unit": "node --test scripts/test/unit/*.test.mjs",
+    "test:smoke": "node scripts/test.mjs",
+    "test": "npm run test:unit && npm run build && npm run test:smoke",
+    "ci": "npm run validate && npm test && npm run audit:performance"
   },
   "dependencies": {
     "glob": "^11.0.0",

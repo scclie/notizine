@@ -2,4 +2,15 @@
     .name = "_recents",
     .type = "builtin",
     .description = "Recent posts list (last 5)",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+        .{ .source = "client.js", .delivery = "deferred", .output = "/assets/modules/recents.js" },
+    ],
+    .params = .{
+        .section = .{ .type = "string", .default = "/posts/" },
+        .count = .{ .type = "integer", .default = 5, .minimum = 1 },
+        .title = .{ .type = "string" },
+        .show = .{ .type = "array", .items = .{ .type = "enum", .values = ["date", "meta"] }, .default = [] },
+    },
 }

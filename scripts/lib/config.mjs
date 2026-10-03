@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { normalizeLayoutConfig } from './layout.mjs';
 
 export function stripZiggy(raw) {
   let out = '';
@@ -47,28 +48,14 @@ export function loadConfig(root = process.cwd(), env = process.env) {
   if (!parsed.site?.host_url) throw new Error('config: site.host_url missing');
   if (!Array.isArray(parsed.site.locales) || parsed.site.locales.length === 0)
     throw new Error('config: site.locales empty');
-  return { ...parsed, theme };
-}
-
-export function checkZineConfigSync(config, root = process.cwd()) {
-  const raw = readFileSync(join(root, 'zine.ziggy'), 'utf-8');
-  const host = raw.match(/\.host_url\s*=\s*"([^"]+)"/)?.[1];
-  if (host !== config.site.host_url)
-    throw new Error(`config: host_url drift zine="${host}" notizine="${config.site.host_url}"`);
-  const cfgCodes = Object.values(config.site.locales).map((l) => l.code);
-  const zineCodes = [...raw.matchAll(/\.code\s*=\s*"([^"]+)"/g)].map((m) => m[1]);
-  const same =
-    cfgCodes.length === zineCodes.length &&
-    cfgCodes.slice().sort().join(',') === zineCodes.slice().sort().join(',');
-  if (!same)
-    throw new Error(`config: locale drift zine=[${zineCodes.join(', ')}] notizine=[${cfgCodes.join(', ')}]`);
+  return normalizeLayoutConfig({ ...parsed, theme });
 }
 
 function ziggyString(s) {
   return '"' + String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
 }
 
-export function syncZineConfig(config, root = process.cwd()) {
+export function renderZineConfig(config) {
   const locales = config.site.locales.map((l) => {
     const lines = [
       `            .code = ${ziggyString(l.code)},`,
@@ -82,7 +69,7 @@ export function syncZineConfig(config, root = process.cwd()) {
     return `        .{\n${lines.join('\n')}\n        },`;
   });
 
-  const content = `.zine_version = "0.13.0",
+  return `.zine_version = "0.13.0",
 .site = .multilingual(.{
     .host_url = ${ziggyString(config.site.host_url)},
     .i18n_dir_path = "i18n",
@@ -93,9 +80,59 @@ ${locales.join('\n')}
     ],
 }),
 `;
+}
 
+function readZiggyField(source, field) {
+  const match = source.match(new RegExp(`\\.${field}\\s*=\\s*"((?:\\\\.|[^"\\\\])*)"`));
+  return match === null ? undefined : JSON.parse(`"${match[1]}"`);
+}
+
+function readZineSiteConfig(source) {
+  const localesSection = source.match(/\.locales\s*=\s*\[([\s\S]*?)\]\s*,/);
+  const locales = localesSection === null
+    ? []
+    : [...localesSection[1].matchAll(/\.\{\s*([\s\S]*?)\s*\},/g)].map(([, locale]) => ({
+      code: readZiggyField(locale, 'code'),
+      name: readZiggyField(locale, 'name'),
+      site_title: readZiggyField(locale, 'site_title'),
+      content_dir_path: readZiggyField(locale, 'content_dir_path'),
+      output_prefix_override: readZiggyField(locale, 'output_prefix_override') ?? null,
+    }));
+  return { host_url: readZiggyField(source, 'host_url'), locales };
+}
+
+function findZineConfigDrift(config, current) {
+  const expectedSite = config.site;
+  const actualSite = readZineSiteConfig(current);
+  if (actualSite.host_url !== expectedSite.host_url) return 'host_url';
+  if (actualSite.locales.length !== expectedSite.locales.length) return 'locales';
+
+  for (const [index, expected] of expectedSite.locales.entries()) {
+    const actual = actualSite.locales[index];
+    for (const field of ['code', 'name', 'site_title', 'content_dir_path', 'output_prefix_override']) {
+      const expectedValue = field === 'output_prefix_override'
+        ? expected[field] ?? null
+        : expected[field];
+      if (actual[field] !== expectedValue) return `locale "${expected.code}".${field}`;
+    }
+  }
+  return 'content';
+}
+
+export function assertZineConfigSync(config, root = process.cwd()) {
   const zinePath = join(root, 'zine.ziggy');
-  const current = readFileSync(zinePath, 'utf-8');
+  const current = readFileSync(zinePath, 'utf8');
+  const expected = renderZineConfig(config);
+  if (current !== expected) {
+    const drift = findZineConfigDrift(config, current);
+    throw new Error(`config: zine.ziggy drift: ${drift}; run npm run sync:zine`);
+  }
+}
+
+export function syncZineConfig(config, root = process.cwd()) {
+  const content = renderZineConfig(config);
+  const zinePath = join(root, 'zine.ziggy');
+  const current = readFileSync(zinePath, 'utf8');
   if (current !== content) {
     writeFileSync(zinePath, content);
     return true;

@@ -1,10 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homeLink } from '../../lib/api.mjs';
-import { v2Slots } from '../../lib/render.mjs';
+import { normalizeLayoutConfig } from '../../lib/layout.mjs';
+import { discoverModules, resolveSlots } from '../../lib/modules.mjs';
+import { renderZones } from '../../lib/render.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const modulePath = (name, file) => join(REPO, 'modules', name, file);
@@ -42,6 +44,30 @@ function captureWarn(fn) {
     console.warn = orig;
   }
 }
+
+test('renderZones supplies normalized manifest params to generators', async () => {
+  const root = '/tmp/opencode/notizine-contract-normalized-params';
+  const moduleDir = join(root, 'modules', 'counter');
+  mkdirSync(moduleDir, { recursive: true });
+  writeFileSync(join(moduleDir, 'module.ziggy'), `.{
+    .name = "counter",
+    .type = "dynamic",
+    .description = "Counter",
+    .delivery = "critical",
+    .params = .{ .count = .{ .type = "integer", .default = 5 } },
+  }`);
+  writeFileSync(join(moduleDir, 'generator.mjs'), 'export default ({ params }) => String(params.count);');
+  const config = {
+    site: { locales: [{ code: 'en', output_prefix_override: '' }] },
+    slots: { middle_center: [[{ module: 'counter', params: { count: 3 } }]] },
+  };
+  const modules = discoverModules(root);
+  const slots = resolveSlots(config, modules);
+
+  await renderZones({ config, pages: [{ locale: 'en', link: '/example/' }] }, { en: key => key }, root, modules, slots);
+
+  assert.equal(readFileSync(join(root, 'assets', '.cache', 'zones', 'example', 'counter.html'), 'utf-8'), '3');
+});
 
 test('spacer keeps its static template', () => {
   assert.equal(readFileSync(modulePath('spacer', 'template.html'), 'utf-8'), '<span class="flex-spacer"></span>');
@@ -128,16 +154,20 @@ test('rss_link follows features.rss and points at locale posts feed', async () =
   assert.equal(await gen({ page: { locale: 'de' }, site: model }), '');
 });
 
-test('v2Slots no longer drops migrated sitewide or per-page modules', () => {
-  const { result, warns } = captureWarn(() =>
-    v2Slots({ footer: [['_social', '_rss_link']], before_main: [['_breadcrumbs', '_prev_next']] })
-  );
-  assert.deepEqual(result.footer, [[{ module: '_social', id: '_social' }, { module: '_rss_link', id: '_rss_link' }]]);
-  assert.deepEqual(result.before_main, [[
-    { module: '_breadcrumbs', id: '_breadcrumbs' },
-    { module: '_prev_next', id: '_prev_next' },
+test('legacy layout migration keeps sitewide and per-page modules', () => {
+  const { result, warns } = captureWarn(() => normalizeLayoutConfig({
+    layout: { columns: ['12rem', '1fr', '12rem'], rows: ['auto', '1fr', 'auto'] },
+    slots: { footer: [['_social', '_rss_link']], before_main: [['_breadcrumbs', '_prev_next']] },
+  }));
+  assert.deepEqual(result.slots.bottom_center, [[
+    { module: '_social', legacyZone: 'footer' },
+    { module: '_rss_link', legacyZone: 'footer' },
   ]]);
-  assert.deepEqual(warns, []);
+  assert.deepEqual(result.slots.top_center, [[
+    { module: '_breadcrumbs', legacyZone: 'before_main' },
+    { module: '_prev_next', legacyZone: 'before_main' },
+  ]]);
+  assert.deepEqual(warns, ['[config] legacy seven-zone slots were migrated to the 3×3 grid']);
 });
 
 function leaf(locale, link, extra = {}) {

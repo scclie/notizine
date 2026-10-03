@@ -2,4 +2,9 @@
     .name = "_breadcrumbs",
     .type = "dynamic",
     .description = "Home / Section / Page breadcrumb chain",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+    ],
+    .params = .{},
 }

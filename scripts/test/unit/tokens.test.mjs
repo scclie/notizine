@@ -11,3 +11,20 @@ test('renderTokens without fonts emits no font variables', () => {
   const css = renderTokens({});
   assert.doesNotMatch(css, /--font-/);
 });
+
+test('renders all grid tracks as CSS variables', () => {
+  const css = renderTokens({
+    layout: {
+      columns: ['14rem', 'minmax(0, 1fr)', '12rem'],
+      rows: ['auto', '1fr', 'auto'],
+      gap: '1.5rem',
+      spacing: 1,
+    },
+    fonts: {},
+  });
+
+  assert.match(css, /--grid-col-1: 14rem;/);
+  assert.match(css, /--grid-col-3: 12rem;/);
+  assert.match(css, /--grid-row-2: 1fr;/);
+  assert.match(css, /--grid-gap: 1\.5rem;/);
+});

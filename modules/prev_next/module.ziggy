@@ -2,4 +2,9 @@
     .name = "_prev_next",
     .type = "dynamic",
     .description = "Previous/Next post pagination",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+    ],
+    .params = .{},
 }

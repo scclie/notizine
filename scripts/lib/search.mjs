@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'path';
 
 function extractText(raw) {
@@ -9,6 +9,14 @@ function extractText(raw) {
     .replace(/^\s*[-+]\s+/gm, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+export function searchIndexPath(root) {
+  return join(root, 'assets', '.cache', 'search.js');
+}
+
+export function removeSearchIndex(root) {
+  rmSync(searchIndexPath(root), { force: true });
 }
 
 export function buildSearchIndex(model, root) {
@@ -29,5 +37,5 @@ export function buildSearchIndex(model, root) {
   }
   const js = 'window.SEARCH_INDEX=' + JSON.stringify(byLocale).replace(/</g, '\\u003c') + ';\n';
   mkdirSync(join(root, 'assets', '.cache'), { recursive: true });
-  writeFileSync(join(root, 'assets', '.cache', 'search.js'), js);
+  writeFileSync(searchIndexPath(root), js);
 }

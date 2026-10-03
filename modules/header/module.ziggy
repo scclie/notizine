@@ -2,4 +2,12 @@
     .name = "_header",
     .type = "builtin",
     .description = "Site title link",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+    ],
+    .params = .{
+        .site_title = .{ .type = "string" },
+        .title = .{ .type = "string" },
+    },
 }

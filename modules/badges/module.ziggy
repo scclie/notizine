@@ -2,8 +2,23 @@
     .name = "badges",
     .type = "static",
     .description = "88x31 badge buttons",
-    // Badge images (base64) are in badges.css — loaded as a separate HTTP request.
-    // This keeps the main inline <style> block smaller and lets the browser
-    // cache badge images independently from the rest of the CSS.
-    // Layout styles (flex, sizing, border) stay in style.css (inlined).
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+        .{ .source = "badges.css", .delivery = "external", .output = "/badges/badges.css" },
+    ],
+    .params = .{
+        .items = .{
+            .type = "array",
+            .items = .{
+                .type = "object",
+                .properties = .{
+                    .href = .{ .type = "url", .required = true },
+                    .src = .{ .type = "string", .required = true },
+                    .alt = .{ .type = "string" },
+                },
+            },
+            .default = [],
+        },
+    },
 }

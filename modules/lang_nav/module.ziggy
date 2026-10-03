@@ -2,4 +2,9 @@
     .name = "_lang_nav",
     .type = "builtin",
     .description = "Language switcher (inline links or dropdown)",
+    .delivery = "critical",
+    .assets = [
+        .{ .source = "style.css", .delivery = "critical" },
+    ],
+    .params = .{},
 }
