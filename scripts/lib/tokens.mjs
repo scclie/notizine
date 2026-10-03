@@ -8,8 +8,8 @@ export function renderTokens(config) {
   lines.push(`--page-width: ${L.width ?? '720px'};`);
   const cols = L.columns ?? ['auto', '720px', 'auto'];
   lines.push(`--col-left: ${cols[0]};`, `--col-right: ${cols[cols.length - 1]};`);
-  if (L.left_width) lines.push(`--sidebar-left-max: ${L.left_width};`);
-  if (L.right_width) lines.push(`--sidebar-right-max: ${L.right_width};`);
+  lines.push(`--sidebar-left-max: ${L.left_width || '300px'};`);
+  lines.push(`--sidebar-right-max: ${L.right_width || '300px'};`);
   for (const part of ['body', 'heading', 'code']) {
     if (config.fonts?.[part]) lines.push(`--font-${part}: ${config.fonts[part]};`);
   }

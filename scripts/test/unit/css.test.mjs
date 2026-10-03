@@ -8,6 +8,9 @@ function freshRoot(name) {
   const root = join('/tmp/opencode', name);
   rmSync(root, { recursive: true, force: true });
   mkdirSync(join(root, 'assets', 'themes'), { recursive: true });
+  mkdirSync(join(root, 'assets', 'css'), { recursive: true });
+  writeFileSync(join(root, 'assets', 'css', 'base.css'), '');
+  writeFileSync(join(root, 'assets', 'css', 'code.css'), '');
   return root;
 }
 

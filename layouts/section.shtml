@@ -13,9 +13,9 @@
     <ctx :if="$page.content().len().gt(0)">
       <div :html="$page.content()"></div>
     </ctx>
-    <ctx :if="$page.subpages().len.gt(0)">
-      <ctx :loop="$page.subpages()">
-        <ctx :if="$loop.it.isSection().not()">
+    <ctx :if="$page.custom.get?('view').eql('flat')">
+      <ctx :if="$page.leaves().len().gt(0)">
+        <ctx :loop="$page.leaves()">
           <article>
             <a class="recent-row recent-row-block" href="$loop.it.link()">
               <div class="recent-row-head">
@@ -30,19 +30,38 @@
         </ctx>
       </ctx>
     </ctx>
-    <ctx :if="$page.subpages().len.gt(0)">
-      <ctx :loop="$page.subpages()">
-        <ctx :if="$loop.it.isSection()">
-          <section>
-            <h2><a href="$loop.it.link()" :text="$loop.it.title"></a></h2>
-            <ctx :if="$loop.it.leaves(5).len.gt(0)">
-              <ul>
-                <li :loop="$loop.it.leaves(5)">
-                  <a href="$loop.it.link()" :text="$loop.it.title"></a>
-                </li>
-              </ul>
-            </ctx>
-          </section>
+    <ctx :if="$page.custom.get?('view').eql('flat').not()">
+      <ctx :if="$page.subpages().len.gt(0)">
+        <ctx :loop="$page.subpages()">
+          <ctx :if="$loop.it.isSection().not()">
+            <article>
+              <a class="recent-row recent-row-block" href="$loop.it.link()">
+                <div class="recent-row-head">
+                  <h2 :text="$loop.it.title"></h2>
+                  <time :text="$loop.it.date.format('2006-01-02')"></time>
+                </div>
+                <ctx :if="$loop.it.description.len().gt(0)">
+                  <p :text="$loop.it.description"></p>
+                </ctx>
+              </a>
+            </article>
+          </ctx>
+        </ctx>
+      </ctx>
+      <ctx :if="$page.subpages().len.gt(0)">
+        <ctx :loop="$page.subpages()">
+          <ctx :if="$loop.it.isSection()">
+            <section>
+              <h2><a href="$loop.it.link()" :text="$loop.it.title"></a></h2>
+              <ctx :if="$loop.it.leaves(5).len.gt(0)">
+                <ul>
+                  <li :loop="$loop.it.leaves(5)">
+                    <a href="$loop.it.link()" :text="$loop.it.title"></a>
+                  </li>
+                </ul>
+              </ctx>
+            </section>
+          </ctx>
         </ctx>
       </ctx>
     </ctx>

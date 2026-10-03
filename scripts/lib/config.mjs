@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export function stripZiggy(raw) {
@@ -62,4 +62,43 @@ export function checkZineConfigSync(config, root = process.cwd()) {
     cfgCodes.slice().sort().join(',') === zineCodes.slice().sort().join(',');
   if (!same)
     throw new Error(`config: locale drift zine=[${zineCodes.join(', ')}] notizine=[${cfgCodes.join(', ')}]`);
+}
+
+function ziggyString(s) {
+  return '"' + String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+}
+
+export function syncZineConfig(config, root = process.cwd()) {
+  const locales = config.site.locales.map((l) => {
+    const lines = [
+      `            .code = ${ziggyString(l.code)},`,
+      `            .name = ${ziggyString(l.name)},`,
+      `            .site_title = ${ziggyString(l.site_title)},`,
+      `            .content_dir_path = ${ziggyString(l.content_dir_path)},`,
+    ];
+    if (l.output_prefix_override !== undefined && l.output_prefix_override !== null) {
+      lines.push(`            .output_prefix_override = ${ziggyString(l.output_prefix_override)},`);
+    }
+    return `        .{\n${lines.join('\n')}\n        },`;
+  });
+
+  const content = `.zine_version = "0.13.0",
+.site = .multilingual(.{
+    .host_url = ${ziggyString(config.site.host_url)},
+    .i18n_dir_path = "i18n",
+    .layouts_dir_path = "layouts",
+    .assets_dir_path = "assets",
+    .locales = [
+${locales.join('\n')}
+    ],
+}),
+`;
+
+  const zinePath = join(root, 'zine.ziggy');
+  const current = readFileSync(zinePath, 'utf-8');
+  if (current !== content) {
+    writeFileSync(zinePath, content);
+    return true;
+  }
+  return false;
 }

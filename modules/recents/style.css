@@ -1,5 +1,10 @@
 .module-recents {
   font-size: 0.9rem;
+  width: 100%;
+}
+
+.slot-row > .align-left:has(> .module-recents) {
+  width: 100%;
 }
 
 .module-recents h3 {
@@ -34,9 +39,54 @@
   color: var(--text-muted);
 }
 
+.recent-meta {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.recent-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.recent-footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recent-footer-top a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.recent-footer-top a:hover {
+  color: var(--accent);
+}
+
+.recent-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.recent-nav-prev,
+.recent-nav-next {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.recent-nav-prev:hover,
+.recent-nav-next:hover {
+  color: var(--accent);
+}
+
 .see-more {
   display: inline-block;
-  margin-top: 0.6rem;
   font-size: 0.85rem;
   color: var(--accent);
   text-decoration: none;
@@ -45,4 +95,13 @@
 .see-more:hover {
   color: var(--accent2);
   text-decoration: underline;
+}
+
+.random-note {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.random-note:hover {
+  color: var(--accent);
 }

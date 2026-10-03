@@ -1,0 +1,32 @@
+<extend template="base.shtml">
+<head id="head">
+  <meta property="og:type" content="website">
+</head>
+<main id="content">
+  <div class="page-content">
+    <header>
+      <h1 :text="$page.title"></h1>
+      <ctx :if="$page.description.len().gt(0)">
+        <p :text="$page.description"></p>
+      </ctx>
+    </header>
+    <ctx :if="$page.content().len().gt(0)">
+      <div :html="$page.content()"></div>
+    </ctx>
+    <ctx :if="$page.leaves().len.gt(0)">
+      <ctx :loop="$page.leaves()">
+        <article>
+          <a class="recent-row recent-row-block" href="$loop.it.link()">
+            <div class="recent-row-head">
+              <h2 :text="$loop.it.title"></h2>
+              <time :text="$loop.it.date.format('2006-01-02')"></time>
+            </div>
+            <ctx :if="$loop.it.description.len().gt(0)">
+              <p :text="$loop.it.description"></p>
+            </ctx>
+          </a>
+        </article>
+      </ctx>
+    </ctx>
+  </div>
+</main>

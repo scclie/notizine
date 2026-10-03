@@ -1,0 +1,11 @@
+#search-input {
+  width: 100%;
+  padding: var(--sp-2, 0.5rem) var(--sp-3, 0.7rem);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 1rem;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  margin-bottom: var(--sp-4, 1rem);
+}

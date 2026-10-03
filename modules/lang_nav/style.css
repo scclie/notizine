@@ -11,7 +11,7 @@
 }
 .lang-nav a:hover {
   background: var(--accent);
-  color: var(--nord0);
+  color: var(--on-accent);
 }
 .lang-nav select {
   font-size: 0.9rem;

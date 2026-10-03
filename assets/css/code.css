@@ -1,17 +1,17 @@
-pre code .keyword { color: var(--nord9); }
-pre code .string { color: var(--nord14); }
-pre code .comment { color: var(--nord3); font-style: italic; }
-pre code .number { color: var(--nord12); }
-pre code .function { color: var(--nord8); }
-pre code .type { color: var(--nord13); }
+pre code .keyword { color: var(--accent3); }
+pre code .string { color: var(--accent2); }
+pre code .comment { color: var(--text-muted); font-style: italic; }
+pre code .number { color: var(--accent); }
+pre code .function { color: var(--accent3); }
+pre code .type { color: var(--accent2); }
 pre code .variable { color: var(--text); }
-pre code .constant { color: var(--nord15); }
-pre code .operator { color: var(--nord7); }
-pre code .punctuation_delimiter { color: var(--nord3); }
+pre code .constant { color: var(--accent); }
+pre code .operator { color: var(--text-muted); }
+pre code .punctuation_delimiter { color: var(--text-muted); }
 pre code .punctuation_bracket { color: var(--text); }
-pre code .builtin { color: var(--nord8); }
-pre code .property { color: var(--nord8); }
-pre code .parameter { color: var(--nord12); }
-pre code .label { color: var(--nord11); }
-pre code .attribute { color: var(--nord12); }
-pre code .tag { color: var(--nord11); }
+pre code .builtin { color: var(--accent3); }
+pre code .property { color: var(--accent3); }
+pre code .parameter { color: var(--accent); }
+pre code .label { color: var(--accent); }
+pre code .attribute { color: var(--accent); }
+pre code .tag { color: var(--accent); }

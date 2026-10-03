@@ -34,6 +34,8 @@ export function bundleCSS(config, installedModules, root) {
   const modules = discoverModules(root);
   const normalized = { ...config, slots: v2Slots(config.slots) };
   const parts = [renderTokens(config)];
+  parts.push(readFileSync(join(root, 'assets', 'css', 'base.css'), 'utf-8'));
+  parts.push(readFileSync(join(root, 'assets', 'css', 'code.css'), 'utf-8'));
   parts.push(readFileSync(join(root, 'assets', 'themes', `${config.theme}.css`), 'utf-8'));
   for (const name of orderedModuleNames(normalized, modules, installedModules)) {
     const stylePath = join(modules[name].dir, 'style.css');

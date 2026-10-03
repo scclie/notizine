@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSy
 import { join, dirname, relative, basename, extname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { default as generateOG } from './generate-og.mjs';
-import { loadConfig, checkZineConfigSync, stripZiggy } from './lib/config.mjs';
+import { loadConfig, syncZineConfig, stripZiggy } from './lib/config.mjs';
 import { buildModel } from './lib/model.mjs';
 import { buildSearchIndex } from './lib/search.mjs';
 import { discoverModules, resolveSlots } from './lib/modules.mjs';
@@ -325,7 +325,7 @@ function computeStats(rawContent) {
 async function newGenerate() {
   console.log('[generate] Starting pre-generation...');
   const config = loadConfig(ROOT);
-  checkZineConfigSync(config, ROOT);
+  syncZineConfig(config, ROOT);
   const model = buildModel(config, ROOT);
   buildSearchIndex(model, ROOT);
   writePerPageAssets(model.pages);
