@@ -19,17 +19,27 @@ export function removeSearchIndex(root) {
   rmSync(searchIndexPath(root), { force: true });
 }
 
+export function attachSearchIndex(assets, instances) {
+  if (!instances.some(instance => instance.module === 'search')) return assets;
+  return {
+    ...assets,
+    deferredScripts: '<script defer src="/.cache/search.js"></script>' + assets.deferredScripts,
+    localAssets: [...new Set(['.cache/search.js', ...assets.localAssets])],
+  };
+}
+
 export function buildSearchIndex(model, root) {
   const byLocale = {};
+  const seen = new Set();
   for (const p of model.pages) {
-    if (p.isSection || !p.filePath) continue;
-    if (p.link.endsWith('/404/')) continue;
+    if (!p.filePath || seen.has(p.link)) continue;
+    seen.add(p.link);
     const raw = readFileSync(p.filePath, 'utf-8');
     (byLocale[p.locale] ??= []).push({
       t: p.title,
       u: p.link,
       d: p.description || '',
-      x: extractText(raw).slice(0, 4000),
+      x: extractText(raw),
     });
   }
   for (const loc of Object.keys(byLocale)) {

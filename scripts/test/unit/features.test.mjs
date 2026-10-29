@@ -7,7 +7,7 @@ import { buildSearchIndex, removeSearchIndex } from '../../lib/search.mjs';
 
 const PROJECT_ROOT = new URL('../../../', import.meta.url).pathname;
 
-function buildFixture(name, { inlineMode, search, customCSS = false }) {
+function buildFixture(name, { inlineMode, search, customCSS = false, searchOnAbout = false }) {
   const root = join('/tmp/opencode', name);
   rmSync(root, { recursive: true, force: true });
   cpSync(PROJECT_ROOT, root, {
@@ -25,6 +25,7 @@ function buildFixture(name, { inlineMode, search, customCSS = false }) {
     writeFileSync(join(root, 'assets', 'css', 'task6-once.css'), 'body{--task6-custom-css-marker:once}');
     config = config.replace('"custom_css": "",', '"custom_css": "css/task6-once.css",');
   }
+  if (searchOnAbout) config = config.replace('"/search/": {', '"/about/": {');
   writeFileSync(configPath, config);
 
   const result = spawnSync('nix-shell', ['--run', 'npm run build'], {
@@ -61,11 +62,8 @@ test('base template gates feature-owned scripts with their feature flags', () =>
     /<ctx :if="\$site\.asset\('notizine\.ziggy'\)\.ziggy\(\)\.get\('features'\)\.get\('darkmode'\)">\s*<script :html="\$site\.asset\('js\/theme\.js'\)\.bytes\(\)"><\/script>\s*<\/ctx>/,
     'dark-mode flash prevention script is emitted only when dark mode is enabled'
   );
-  assert.match(
-    template,
-    /<ctx :if="\$site\.asset\('notizine\.ziggy'\)\.ziggy\(\)\.get\('features'\)\.get\('search'\)">\s*<script defer src="\$site\.asset\('\.cache\/search\.js'\)\.link\(\)"><\/script>\s*<\/ctx>/,
-    'search index script is emitted only when search is enabled'
-  );
+  assert.doesNotMatch(template, /asset\('\.cache\/search\.js'\)/,
+    'search index is registered by consuming pages rather than globally in the base template');
 });
 
 test('disabled search omits search markup and generated assets from build output', { timeout: 600000 }, () => {
@@ -76,10 +74,27 @@ test('disabled search omits search markup and generated assets from build output
   });
   const html = readFileSync(join(publicDir, 'search', 'index.html'), 'utf-8');
 
-  assert.doesNotMatch(html, /search-(input|results)|search\.js/);
+  assert.doesNotMatch(html, /search-(input|results|widget)|search\.js/);
   assert.equal(existsSync(join(publicDir, '.cache', 'search.js')), false);
   assert.equal(existsSync(join(publicDir, 'assets', 'modules', 'search.js')), false);
   assert.equal(occurrences(html, '--task6-custom-css-marker:once'), 1);
+});
+
+test('search assets follow the resolved widget even when placed on about instead of search', { timeout: 600000 }, () => {
+  const publicDir = buildFixture('notizine-features-search-on-about', {
+    inlineMode: true, search: true, searchOnAbout: true,
+  });
+  for (const file of ['index.html', 'search/index.html', 'posts/first-post/index.html']) {
+    const html = readFileSync(join(publicDir, file), 'utf8');
+    assert.doesNotMatch(html, /<script[^>]+src="[^\"]*search\.js"/);
+    assert.doesNotMatch(html, /class="search-widget"/);
+  }
+  const html = readFileSync(join(publicDir, 'about/index.html'), 'utf8');
+  assert.match(html, /class="search-widget"/);
+  assert.ok(html.indexOf('src="/.cache/search.js"') < html.indexOf('src="/assets/modules/search.js"'));
+  assert.equal((html.match(/src="\/.cache\/search\.js"/g) ?? []).length, 1);
+  assert.ok(existsSync(join(publicDir, '.cache/search.js')));
+  assert.ok(existsSync(join(publicDir, 'assets/modules/search.js')));
 });
 
 test('linked CSS output contains unique custom CSS exactly once', { timeout: 600000 }, () => {

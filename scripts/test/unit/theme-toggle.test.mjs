@@ -9,7 +9,7 @@ test('theme_toggle emits checkbox markup when darkmode enabled', async () => {
   const html = await gen({ page: {}, site, params: {}, i18n: k => k });
   assert.match(html, /class="theme-toggle"/);
   assert.match(html, /id="theme-dark"/);
-  assert.match(html, /<label for="theme-dark" class="theme-dark-label" title="Toggle theme"><\/label>/);
+  assert.match(html, /<label for="theme-dark" class="theme-dark-label" title="toggle theme"><\/label>/);
 });
 
 test('theme_toggle emits nothing when darkmode disabled or missing', async () => {

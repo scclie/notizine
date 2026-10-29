@@ -1,0 +1,15 @@
+---
+.title = "first post",
+.description = "a first note to get things going",
+.date = .date("2026-10-11T00:00:00"),
+.tags = ["personal", "notes"],
+.layout = "page.shtml",
+---
+
+first post
+
+more on the [about page](/about/)
+
+```sh
+printf 'hello\n'
+```

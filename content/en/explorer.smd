@@ -1,5 +1,7 @@
 ---
-.title = "Site Explorer",
-.date = .date("2026-01-01T00:00:00"),
+.title = "explorer",
+.date = .date("2026-10-11T00:00:00"),
 .layout = "explorer.shtml",
 ---
+
+everything on the site in one tree

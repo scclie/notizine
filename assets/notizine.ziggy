@@ -59,28 +59,16 @@
   // Empty array [] = an empty grid cell.
   "slots": {
     "top_left": [],
-    "top_center": [
-      [{ "module": "divider" }],
-      [{ "module": "_breadcrumbs" }]
-    ],
+    "top_center": [[{ "module": "divider" }], [{ "module": "_breadcrumbs" }]],
     "top_right": [],
-    // Left: site title + theme toggle above the documentation tree; Right: updates feed
     "middle_left": [
-      [{ "module": "_header", "site_title": "notizine" },{ "module": "_theme_toggle" }],
-      [{ "module": "_explorer", "root": "/notes/" }]
+      [{ "module": "_header", "site_title": "notizine" }, { "module": "_theme_toggle" }],
+      [{ "module": "_explorer", "root": "/" }]
     ],
     "middle_center": [],
-    "middle_right": [
-      [{ "module": "_recents", "id": "_recents_updates", "section": "/updates/", "title": "Updates", "count": 3, "show": ["date"] }]
-    ],
+    "middle_right": [[{ "module": "_recents", "section": "/posts/", "title": "recent posts", "count": 5, "show": ["date"] }]],
     "bottom_left": [],
-    "bottom_center": [
-      [{ "module": "divider" }],
-      [{ "module": "badges", "align": "center" }],
-      [{ "module": "_footer_text", "align": "center" }],
-      [{ "module": "_rss_link", "align": "center" }],
-      [{ "module": "_back_to_top", "align": "center" }]
-    ],
+    "bottom_center": [[{ "module": "divider" }], [{ "module": "_footer_text", "align": "center", "text": "your site" }], [{ "module": "_back_to_top", "align": "center" }]],
     "bottom_right": []
   },
 
@@ -99,13 +87,16 @@
   "slots_overrides": {
     "/search/": {
       "top_left": [],
-      "top_center": [],
+      "top_center": [[{ "module": "divider" }], [{ "module": "_breadcrumbs" }]],
       "top_right": [],
-      "middle_left": [],
+      "middle_left": [
+        [{ "module": "_header", "site_title": "notizine" }, { "module": "_theme_toggle" }],
+        [{ "module": "_explorer", "root": "/" }]
+      ],
       "middle_center": [[{ "module": "search", "id": "search" }]],
-      "middle_right": [],
+      "middle_right": [[{ "module": "_recents", "section": "/posts/", "title": "recent posts", "count": 5, "show": ["date"] }]],
       "bottom_left": [],
-      "bottom_center": [],
+      "bottom_center": [[{ "module": "divider" }], [{ "module": "_footer_text", "align": "center", "text": "your site" }], [{ "module": "_back_to_top", "align": "center" }]],
       "bottom_right": []
     }
   },

@@ -39,9 +39,67 @@ for (const file of htmlFiles) {
   assert(emDash.length === 0, `No em-dash in ${rel}`);
 }
 
-// Test: center slot renders content
+const expectedHtmlRoutes = [
+  '/404.html',
+  '/404/index.html',
+  '/about/index.html',
+  '/explorer/index.html',
+  '/index.html',
+  '/posts/first-post/index.html',
+  '/posts/index.html',
+  '/recents/index.html',
+  '/search/index.html',
+  '/tags/index.html',
+].sort();
+const actualHtmlRoutes = htmlFiles.map(file => file.slice(PUBLIC.length)).sort();
+assert(
+  JSON.stringify(actualHtmlRoutes) === JSON.stringify(expectedHtmlRoutes),
+  'Generated HTML routes exactly match the compact route matrix and 404 alias',
+);
+
+// The compact personal starter exposes exactly the supported public route matrix.
+const requiredRoutes = [
+  ['home', join(PUBLIC, 'index.html')],
+  ['posts section', join(PUBLIC, 'posts', 'index.html')],
+  ['first post', join(PUBLIC, 'posts', 'first-post', 'index.html')],
+  ['about', join(PUBLIC, 'about', 'index.html')],
+  ['search', join(PUBLIC, 'search', 'index.html')],
+  ['tags', join(PUBLIC, 'tags', 'index.html')],
+  ['recents', join(PUBLIC, 'recents', 'index.html')],
+  ['explorer', join(PUBLIC, 'explorer', 'index.html')],
+  ['404', join(PUBLIC, '404', 'index.html')],
+];
+for (const [name, route] of requiredRoutes) {
+  assert(existsSync(route), `${name} route exists`);
+}
+
+const removedRoutes = [
+  ['notes', join(PUBLIC, 'notes', 'index.html')],
+  ['updates', join(PUBLIC, 'updates', 'index.html')],
+  ['notes modules', join(PUBLIC, 'notes', 'modules', 'index.html')],
+  ['notes delivery', join(PUBLIC, 'notes', 'delivery', 'index.html')],
+  ['notes validation and performance', join(PUBLIC, 'notes', 'validation-and-performance', 'index.html')],
+];
+for (const [name, route] of removedRoutes) {
+  assert(!existsSync(route), `${name} route is absent`);
+}
+for (const directory of ['notes', 'updates']) {
+  assert(!existsSync(join(PUBLIC, directory)), `${directory} output directory is absent`);
+}
+
 const indexHtml = readFileSync(join(PUBLIC, 'index.html'), 'utf-8');
-assert(indexHtml.includes('is a starter'), 'Center slot renders content in index.html');
+for (const [name, file] of [['home', 'index.html'], ['about', 'about/index.html']]) {
+  assert(!/<script[^>]+src="[^"]*search\.js"/.test(readFileSync(join(PUBLIC, file), 'utf8')),
+    `${name} does not load the search client or index`);
+}
+const searchHtml = readFileSync(join(PUBLIC, 'search/index.html'), 'utf8');
+assert(searchHtml.includes('class="search-widget"'), 'Search page renders its widget');
+assert(searchHtml.indexOf('src="/.cache/search.js"') >= 0
+  && searchHtml.indexOf('src="/.cache/search.js"') < searchHtml.indexOf('src="/assets/modules/search.js"'),
+  'Search index loads before its client on the search page');
+assert(indexHtml.includes('welcome'), 'Home renders the personal welcome');
+assert(indexHtml.includes('href="/posts/"'), 'Home links to posts');
+assert(indexHtml.includes('href="/about/"'), 'Home links to about');
 
 const gridCells = [
   'top-left', 'top-center', 'top-right',
@@ -56,43 +114,86 @@ assert(!/\bzone-(left|center|right)\b/.test(indexHtml), 'No legacy structural zo
 const assetsJsonPath = join(process.cwd(), 'assets', '.cache', 'per-page-assets.json');
 assert(existsSync(assetsJsonPath), 'per-page-assets.json exists after build');
 
-// Test: page without companion files has no unwanted artifacts
-const postsHtml = readFileSync(join(PUBLIC, 'notes', 'getting-started', 'index.html'), 'utf-8');
-const injectedCount = (postsHtml.match(/per-page-assets/g) || []).length;
-assert(injectedCount === 0, 'Pages without companion files have no per-page-assets references');
-// 1. Content not duplicated (task-2: body text should appear exactly once)
-const helloHtml = readFileSync(join(PUBLIC, 'notes', 'getting-started', 'index.html'), 'utf-8');
-  const bodyCount = (helloHtml.match(/nix-shell/g) || []).length;
-assert(bodyCount === 1, 'Content body not duplicated in docs page');
+const firstPostPath = join(PUBLIC, 'posts', 'first-post', 'index.html');
+const firstPostHtml = existsSync(firstPostPath) ? readFileSync(firstPostPath, 'utf-8') : '';
+const injectedCount = (firstPostHtml.match(/per-page-assets/g) || []).length;
+assert(injectedCount === 0, 'First post has no per-page-assets references');
+assert(firstPostHtml.includes('first post'), 'First post renders its title');
+assert(
+  firstPostHtml.includes('<nav class="breadcrumbs"><a href="/">home</a><span class="crumb-sep" aria-hidden="true">›</span><a href="/posts/">posts</a><span class="crumb-sep" aria-hidden="true">›</span><span>first post</span></nav>'),
+  'First post renders the generated › breadcrumb',
+);
+const firstPostCss = [...firstPostHtml.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)]
+  .map(match => match[1]).join('\n');
+assert(
+  /\.breadcrumbs\s+:is\(a,\s*span:not\(\.crumb-sep\)\)\s*\{[^}]*min-width:\s*0;[^}]*overflow-wrap:\s*anywhere(?:;|\})/.test(firstPostCss),
+  'Built first-post CSS preserves the descendant selector for long breadcrumb label wrapping',
+);
+const footerHtml = firstPostHtml.match(/<footer\b[^>]*>[\s\S]*?<\/footer>/)?.[0] ?? '';
+assert(footerHtml.includes('class="footer-text"'), 'First post renders the compact footer text');
+assert(!footerHtml.includes('module-badges'), 'First post footer has no badges');
+assert(!footerHtml.includes('notizine'), 'First post footer has no attribution');
+assert(firstPostHtml.includes('<time>2026-10-11</time>'), 'First post renders its date');
+assert(
+  firstPostHtml.includes('href="/tags/?tag=personal"')
+    && firstPostHtml.includes('href="/tags/?tag=notes"'),
+  'First post renders its tags',
+);
+assert(firstPostHtml.includes('<a href="/about/">about page</a>'), 'First post renders its link');
+assert(/<pre><code(?:\s[^>]*)?>/.test(firstPostHtml), 'First post renders its fenced code block');
 
-// 2. .recent-meta used instead of <time> for recents display
 const recentsHtml = readFileSync(join(PUBLIC, 'recents', 'index.html'), 'utf-8');
 const recentMetaCount = (recentsHtml.match(/class="recent-meta"/g) || []).length;
 assert(recentMetaCount > 0, '.recent-meta present in output');
 
-// 3. per-page-assets.json has wordcount/readtime for a known page
-const assetsJson = JSON.parse(readFileSync(join(process.cwd(), 'assets', '.cache', 'per-page-assets.json'), 'utf-8'));
-const helloKey = '/notes/getting-started/';
-assert(typeof assetsJson[helloKey].wordcount === 'number', 'Page has wordcount');
-assert(typeof assetsJson[helloKey].readtime === 'number', 'Page has readtime');
-
-// section.shtml renders subpages
-const updatesSectionHtml = readFileSync(join(PUBLIC, 'updates', 'index.html'), 'utf-8');
-assert(updatesSectionHtml.includes('Module engine'), 'Updates section lists subpages');
+const assetsJson = JSON.parse(readFileSync(assetsJsonPath, 'utf-8'));
+const firstPostKey = '/posts/first-post/';
+assert(typeof assetsJson[firstPostKey]?.wordcount === 'number', 'First post has wordcount');
+assert(typeof assetsJson[firstPostKey]?.readtime === 'number', 'First post has readtime');
 
 const postsSectionHtml = readFileSync(join(PUBLIC, 'posts', 'index.html'), 'utf-8');
-assert(postsSectionHtml.includes('Posts'), 'Section without custom.view renders through section.shtml');
+assert(postsSectionHtml.includes('first post'), 'Posts section lists the first post');
 
-// _recents uses section-based filtering (no URL filter); scope to widget items
-// (explorer in the sidebar may legitimately link /tags/ and /search/)
+// _recents uses section-based filtering (no URL filter); scope to widget items.
 const recentItemLinks = [...recentsHtml.matchAll(/<div class="recent-item"><a href="([^"]*)"/g)].map(m => m[1]);
-assert(recentItemLinks.length > 0, 'recents items have links');
+assert(recentItemLinks.includes('/posts/first-post/'), 'recents includes the first post');
 assert(!recentItemLinks.some(l => l.includes('/tags/') || l.includes('/search/')), 'No tags/search link in recents items');
 
-// No _recents URL filter remnants in base.shtml (explorer filters are separate)
+// No _recents URL filter remnants in base.shtml (explorer filters are separate).
 const baseHtml = readFileSync(join(process.cwd(), 'layouts', 'templates', 'base.shtml'), 'utf-8');
 const oldRecentsFilter = (baseHtml.match(/endsWith\('posts\/'\)/g) || []).length;
 assert(oldRecentsFilter === 0, 'No _recents URL filter remnants in base.shtml');
+assert(baseHtml.includes('<!-- notizine-performance:critical-shell:start -->'), 'Performance critical-shell start marker exists in base.shtml');
+assert(baseHtml.includes('<!-- notizine-performance:critical-shell:end -->'), 'Performance critical-shell end marker exists in base.shtml');
+assert(baseHtml.includes('<!-- notizine-performance:page-body:start -->'), 'Performance page-body start marker exists in base.shtml');
+assert(baseHtml.includes('<!-- notizine-performance:page-body:end -->'), 'Performance page-body end marker exists in base.shtml');
+
+const configSource = readFileSync(join(process.cwd(), 'assets', 'notizine.ziggy'), 'utf-8');
+const gridCellNames = [
+  'top_left', 'top_center', 'top_right',
+  'middle_left', 'middle_center', 'middle_right',
+  'bottom_left', 'bottom_center', 'bottom_right',
+];
+const rootSlotsSource = configSource.match(/"slots": \{([\s\S]*?)\n  \},\n\n  \/\/ ── Layout/)?.[1] ?? '';
+for (const cell of gridCellNames) {
+  assert(new RegExp(`"${cell}"\\s*:`).test(rootSlotsSource), `Personal starter slots explicitly include ${cell}`);
+}
+assert(rootSlotsSource.includes('"module": "_explorer", "root": "/"'), 'Personal starter explorer is rooted at /');
+assert(rootSlotsSource.includes('"module": "_recents", "section": "/posts/"'), 'Personal starter recents are rooted at /posts/');
+assert(!configSource.includes('"module": "active_modules"'), 'Personal starter omits active_modules');
+assert(!configSource.includes('"module": "badges"'), 'Personal starter omits promotional badges');
+assert(!configSource.includes('"module": "_rss_link"'), 'Personal starter omits the RSS footer link');
+assert(!configSource.includes('"/notes/modules/"'), 'Personal starter omits the module-catalog override');
+
+const searchOverrideSource = configSource.match(/"\/search\/": \{([\s\S]*?)\n    \}\n  \}/)?.[1] ?? '';
+if (searchOverrideSource) {
+  for (const cell of gridCellNames) {
+    assert(new RegExp(`"${cell}"\\s*:`).test(searchOverrideSource), `Search override explicitly includes ${cell}`);
+  }
+  assert(!searchOverrideSource.includes('"module": "active_modules"'), 'Search override omits active_modules');
+  assert(!searchOverrideSource.includes('"module": "badges"'), 'Search override omits promotional badges');
+  assert(!searchOverrideSource.includes('"module": "_rss_link"'), 'Search override omits the RSS footer link');
+}
 
 console.log(`[test] ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

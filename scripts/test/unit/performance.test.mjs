@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -82,6 +82,93 @@ test('counts remote scripts without defer as external references', () => {
   });
 
   assert.equal(report.externalReferences, 1);
+});
+
+test('writes an error-policy report before exiting non-zero for overflow', () => {
+  const root = mkdtempSync(join(tmpdir(), 'notizine-performance-error-'));
+  mkdirSync(join(root, 'assets'));
+  mkdirSync(join(root, 'public'));
+  writeFileSync(join(root, 'assets', 'notizine.ziggy'), JSON.stringify({
+    theme: 'nord-default',
+    site: {
+      host_url: 'https://example.test',
+      locales: [{ code: 'en', name: 'English', site_title: 'Notizine', content_dir_path: 'content/en' }],
+    },
+    layout: { columns: ['1fr', '1fr', '1fr'], rows: ['auto', '1fr', 'auto'] },
+    performance: {
+      critical_html_gzip_budget: '0.1kb',
+      on_budget_exceeded: 'error',
+    },
+  }));
+  writeFileSync(join(root, 'public', 'index.html'), '<!doctype html><style>' + 'a{}'.repeat(10_000) + '</style><main>x</main>');
+
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('../../audit-performance.mjs', import.meta.url))], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 1, `${result.stdout}\n${result.stderr}`);
+  assert.ok(existsSync(join(root, 'public', 'notizine-performance.json')), `${result.stdout}\n${result.stderr}`);
+  const report = JSON.parse(readFileSync(join(root, 'public', 'notizine-performance.json'), 'utf8'));
+  assert.equal(report.pages[0].budgetStatus, 'error');
+  assert.match(result.stdout, /budget=error/);
+});
+
+test('rejects an invalid configured overflow policy instead of downgrading it to warn', () => {
+  const root = mkdtempSync(join(tmpdir(), 'notizine-performance-invalid-policy-'));
+  mkdirSync(join(root, 'assets'));
+  mkdirSync(join(root, 'public'));
+  writeFileSync(join(root, 'assets', 'notizine.ziggy'), JSON.stringify({
+    theme: 'nord-default',
+    site: {
+      host_url: 'https://example.test',
+      locales: [{ code: 'en', name: 'English', site_title: 'Notizine', content_dir_path: 'content/en' }],
+    },
+    layout: { columns: ['1fr', '1fr', '1fr'], rows: ['auto', '1fr', 'auto'] },
+    performance: {
+      critical_html_gzip_budget: '14kb',
+      on_budget_exceeded: 'typo',
+    },
+  }));
+  writeFileSync(join(root, 'public', 'index.html'), markedHtml('<main>audit fixture</main>'));
+
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('../../audit-performance.mjs', import.meta.url))], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  assert.notEqual(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.match(result.stderr, /performance: invalid budget policy "typo"/);
+  assert.equal(existsSync(join(root, 'public', 'notizine-performance.json')), false);
+});
+
+test('writes a warn-policy overflow report and exits zero', () => {
+  const root = mkdtempSync(join(tmpdir(), 'notizine-performance-warn-'));
+  mkdirSync(join(root, 'assets'));
+  mkdirSync(join(root, 'public'));
+  writeFileSync(join(root, 'assets', 'notizine.ziggy'), JSON.stringify({
+    theme: 'nord-default',
+    site: {
+      host_url: 'https://example.test',
+      locales: [{ code: 'en', name: 'English', site_title: 'Notizine', content_dir_path: 'content/en' }],
+    },
+    layout: { columns: ['1fr', '1fr', '1fr'], rows: ['auto', '1fr', 'auto'] },
+    performance: {
+      critical_html_gzip_budget: '0.1kb',
+      on_budget_exceeded: 'warn',
+    },
+  }));
+  writeFileSync(join(root, 'public', 'index.html'), '<!doctype html><style>' + 'a{}'.repeat(10_000) + '</style><main>x</main>');
+
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('../../audit-performance.mjs', import.meta.url))], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  const report = JSON.parse(readFileSync(join(root, 'public', 'notizine-performance.json'), 'utf8'));
+  assert.equal(report.pages[0].budgetStatus, 'warn');
+  assert.match(result.stdout, /budget=warn/);
 });
 
 test('audits public HTML files in deterministic relative-path order', () => {

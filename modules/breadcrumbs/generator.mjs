@@ -9,5 +9,5 @@ export default async function ({ page, site, params, i18n }) {
     parts.push(`<a href="${parent.link}">${esc(parent.title)}</a>`);
   }
   parts.push(`<span>${esc(page.title)}</span>`);
-  return `<nav class="breadcrumbs">${parts.join('<span class="crumb-sep">/</span>')}</nav>`;
+  return `<nav class="breadcrumbs">${parts.join('<span class="crumb-sep" aria-hidden="true">›</span>')}</nav>`;
 }

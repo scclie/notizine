@@ -9,7 +9,11 @@ const REPORT_PATH = join(PUBLIC_DIRECTORY, 'notizine-performance.json');
 const NOTE = 'Static gzip byte counts only. Independently compressed fragments are diagnostic and non-additive; this audit does not measure network performance.';
 
 function configuredOverflowPolicy(performance = {}) {
-  return performance.on_budget_exceeded ?? performance.onBudgetExceeded ?? 'warn';
+  const onBudgetExceeded = performance.on_budget_exceeded ?? performance.onBudgetExceeded ?? 'warn';
+  if (onBudgetExceeded !== 'warn' && onBudgetExceeded !== 'error') {
+    throw new Error(`performance: invalid budget policy ${JSON.stringify(onBudgetExceeded)}`);
+  }
+  return onBudgetExceeded;
 }
 
 function main() {

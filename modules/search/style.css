@@ -1,4 +1,25 @@
-#search-input {
+.search-widget {
+  width: 100%;
+}
+
+.search-results > * {
+  margin-block: 1rem;
+}
+
+.search-results a {
+  color: var(--accent);
+  font-size: 1.1rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.search-results p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.search-input {
   width: 100%;
   padding: var(--sp-2, 0.5rem) var(--sp-3, 0.7rem);
   border: 1px solid var(--border);
@@ -6,6 +27,5 @@
   font-size: 1rem;
   background: var(--bg);
   color: var(--text);
-  outline: none;
   margin-bottom: var(--sp-4, 1rem);
 }

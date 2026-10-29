@@ -1,13 +1,28 @@
 .breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem;
+  margin: 0;
   font-size: 0.85em;
-  margin-bottom: 1rem;
   color: var(--text-muted);
 }
+
 .breadcrumbs a {
   color: var(--accent);
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
+
+.breadcrumbs :is(a, span:not(.crumb-sep)) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .breadcrumbs a:hover {
   color: var(--accent2);
-  text-decoration: underline;
+}
+
+.breadcrumbs .crumb-sep {
+  color: var(--accent2);
 }

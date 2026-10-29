@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { cpSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, symlinkSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { basename, join } from 'node:path';
 import { renderZones } from '../../lib/render.mjs';
 import { buildPageAssets } from '../../lib/module-assets.mjs';
 import { normalizeLayoutConfig } from '../../lib/layout.mjs';
@@ -9,6 +10,7 @@ import { discoverModules, resolveSlots } from '../../lib/modules.mjs';
 import dividerGenerator from '../../../modules/divider/generator.mjs';
 
 const API_URL = new URL('../../lib/api.mjs', import.meta.url).href;
+const PROJECT_ROOT = new URL('../../../', import.meta.url).pathname;
 
 function page(locale, link, extra = {}) {
   return {
@@ -112,6 +114,151 @@ test('renderZones keeps visual grid-cell order for partial overrides and page as
     '<script defer src="/assets/modules/override.js"></script>' +
     '<script defer src="/assets/modules/right.js"></script>'
   );
+});
+
+test('renderZones passes each active module once with its effective delivery to generators', async () => {
+  const root = '/tmp/opencode/notizine-render-active-modules';
+  mkdirSync(root, { recursive: true });
+  writeModule(root, '_header', {
+    'module.ziggy': '.{ .name = "_header", .delivery = "critical" }',
+    'generator.mjs': 'export default async ({ activeModules }) => JSON.stringify(activeModules);',
+  });
+  writeModule(root, 'search', {
+    'module.ziggy': '.{ .name = "search", .delivery = "deferred" }',
+    'generator.mjs': 'export default async ({ activeModules }) => JSON.stringify(activeModules);',
+  });
+  const config = {
+    site: { locales: [{ code: 'en', output_prefix_override: '' }] },
+    slots_overrides: {},
+    slots: {
+      top_left: [['_header']],
+      middle_center: [['search']],
+      bottom_right: [[{ module: '_header', delivery: 'deferred' }]],
+    },
+  };
+  const modules = discoverModules(root);
+  const slots = resolveSlots(config, modules);
+  const model = { config, pages: [page('en', '/a/')] };
+
+  await renderZones(model, {}, root, modules, slots);
+
+  assert.deepEqual(
+    JSON.parse(readFileSync(join(root, 'assets', '.cache', 'zones', 'a', '_header.html'), 'utf-8')),
+    [
+      { name: '_header', delivery: 'mixed' },
+      { name: 'search', delivery: 'deferred' },
+    ]
+  );
+});
+
+test('renderZones passes different active modules to generators after page slot overrides', async () => {
+  const root = '/tmp/opencode/notizine-render-active-modules-overrides';
+  mkdirSync(root, { recursive: true });
+  writeModule(root, 'reporter', {
+    'module.ziggy': '.{ .name = "reporter", .delivery = "critical" }',
+    'generator.mjs': 'export default async ({ activeModules }) => JSON.stringify(activeModules);',
+  });
+  for (const name of ['default-nav', 'docs-nav']) {
+    writeModule(root, name, { 'module.ziggy': `.{ .name = "${name}" }` });
+  }
+  const config = {
+    site: { locales: [{ code: 'en', output_prefix_override: '' }] },
+    slots: {
+      top_left: [['reporter']],
+      middle_left: [['default-nav']],
+    },
+    slots_overrides: {
+      '/docs/': { middle_left: [['docs-nav']] },
+    },
+  };
+  const modules = discoverModules(root);
+  const slots = resolveSlots(config, modules);
+  const model = { config, pages: [page('en', '/a/'), page('en', '/docs/a/')] };
+
+  await renderZones(model, {}, root, modules, slots);
+
+  assert.deepEqual(
+    JSON.parse(readFileSync(join(root, 'assets', '.cache', 'zones', 'a', 'reporter.html'), 'utf-8')),
+    [
+      { name: 'reporter', delivery: 'critical' },
+      { name: 'default-nav', delivery: 'critical' },
+    ]
+  );
+  assert.deepEqual(
+    JSON.parse(readFileSync(join(root, 'assets', '.cache', 'zones', 'docs', 'a', 'reporter.html'), 'utf-8')),
+    [
+      { name: 'reporter', delivery: 'critical' },
+      { name: 'docs-nav', delivery: 'critical' },
+    ]
+  );
+});
+
+test('renderZones keeps repeated same-delivery active modules as one non-mixed record', async () => {
+  const root = '/tmp/opencode/notizine-render-active-modules-same-delivery';
+  mkdirSync(root, { recursive: true });
+  writeModule(root, 'reporter', {
+    'module.ziggy': '.{ .name = "reporter", .delivery = "critical" }',
+    'generator.mjs': 'export default async ({ activeModules }) => JSON.stringify(activeModules);',
+  });
+  writeModule(root, 'repeat', {
+    'module.ziggy': '.{ .name = "repeat", .delivery = "deferred" }',
+  });
+  const config = {
+    site: { locales: [{ code: 'en', output_prefix_override: '' }] },
+    slots_overrides: {},
+    slots: {
+      top_left: [['reporter']],
+      middle_left: [['repeat']],
+      bottom_right: [['repeat']],
+    },
+  };
+  const modules = discoverModules(root);
+  const slots = resolveSlots(config, modules);
+  const model = { config, pages: [page('en', '/a/')] };
+
+  await renderZones(model, {}, root, modules, slots);
+
+  assert.deepEqual(
+    JSON.parse(readFileSync(join(root, 'assets', '.cache', 'zones', 'a', 'reporter.html'), 'utf-8')),
+    [
+      { name: 'reporter', delivery: 'critical' },
+      { name: 'repeat', delivery: 'deferred' },
+    ]
+  );
+});
+
+test('generation excludes disabled feature modules from generator activeModules context', { timeout: 120000 }, () => {
+  const root = join('/tmp/opencode', 'notizine-render-active-modules-disabled-feature');
+  rmSync(root, { recursive: true, force: true });
+  cpSync(PROJECT_ROOT, root, {
+    recursive: true,
+    filter: source => !['.git', 'node_modules', 'public'].includes(basename(source)),
+  });
+  symlinkSync(join(PROJECT_ROOT, 'node_modules'), join(root, 'node_modules'), 'dir');
+  writeModule(root, 'active-context', {
+    'module.ziggy': '.{ .name = "active-context" }',
+    'generator.mjs': 'export default async ({ activeModules }) => JSON.stringify(activeModules);',
+  });
+  const configPath = join(root, 'assets', 'notizine.ziggy');
+  const config = readFileSync(configPath, 'utf-8')
+    .replace('"search": true,', '"search": false,')
+    .replace('"og_images": true,', '"og_images": false,')
+    .replace('"middle_center": [],', '"middle_center": [[{ "module": "active-context" }]],');
+  writeFileSync(configPath, config);
+
+  const result = spawnSync(process.execPath, [join(root, 'scripts', 'generate.mjs')], {
+    cwd: root,
+    encoding: 'utf-8',
+    timeout: 120000,
+  });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+
+  const activeModules = JSON.parse(readFileSync(
+    join(root, 'assets', '.cache', 'zones', 'index', 'active-context.html'),
+    'utf-8'
+  ));
+  assert.equal(activeModules.some(({ name }) => name === 'active-context'), true);
+  assert.equal(activeModules.some(({ name }) => name === 'search'), false);
 });
 
 test('renderZones passes cell and legacy zone to module generators', async () => {

@@ -1,7 +1,7 @@
 .{
     .name = "search",
     .type = "builtin",
-    .description = "Client-side title search over the site model",
+    .description = "Local full-text search over all published pages",
     .delivery = "critical",
     .assets = [
         .{ .source = "style.css", .delivery = "critical" },

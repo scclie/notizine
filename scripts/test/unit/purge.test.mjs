@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import purge from '../../purge.mjs';
 
@@ -65,3 +65,36 @@ test('purge uses all pages when pruning shared generated CSS', async () => {
   assert.match(css, /\.linked\{color:green\}/);
   assert.doesNotMatch(css, /\.dropped/);
 });
+
+for (const delivery of ['inline', 'linked']) {
+  test(`purge preserves descendant pseudo-selectors in ${delivery} CSS output`, async () => {
+    const root = mkdtempSync('/tmp/opencode/notizine-purge-');
+    const htmlPath = join(root, 'index.html');
+    const cssPath = join(root, 'assets', 'css', 'generated.css');
+    const css = `
+      .breadcrumbs :is(a, span:not(.crumb-sep)) { min-width: 0; overflow-wrap: anywhere; }
+      .breadcrumbs :not(.crumb-sep) { max-width: 100%; }
+      .breadcrumbs ::before { content: "label"; }
+      .breadcrumbs:hover { color: red; }
+    `;
+    const body = '<nav class="breadcrumbs"><a href="/">LongLabel</a><span class="crumb-sep">›</span><span>Current</span></nav>';
+
+    try {
+      mkdirSync(join(root, 'assets', 'css'), { recursive: true });
+      writeFileSync(htmlPath, delivery === 'inline' ? `<style>${css}</style>${body}` : body);
+      if (delivery === 'linked') writeFileSync(cssPath, css);
+
+      await purge(root);
+
+      const output = delivery === 'inline'
+        ? readFileSync(htmlPath, 'utf-8').match(/<style>([\s\S]*?)<\/style>/)[1]
+        : readFileSync(cssPath, 'utf-8');
+      assert.match(output, /\.breadcrumbs :is\(a,span:not\(\.crumb-sep\)\)\{min-width:0;overflow-wrap:anywhere\}/);
+      assert.match(output, /\.breadcrumbs :not\(\.crumb-sep\)\{max-width:100%\}/);
+      assert.match(output, /\.breadcrumbs ::before\{content:"label"\}/);
+      assert.match(output, /\.breadcrumbs:hover\{color:red\}/);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+}

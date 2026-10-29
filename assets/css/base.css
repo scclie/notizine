@@ -98,27 +98,27 @@ body {
   margin-bottom: var(--sp-7, 2rem);
 }
 
-#header a {
+#header .site-title {
   font-size: 1.2rem;
   font-weight: 700;
   text-decoration: none;
   color: var(--accent);
 }
 
-#header nav {
+#header nav:not(.breadcrumbs) {
   display: flex;
   gap: var(--sp-2, 0.5rem);
   font-size: 0.9rem;
 }
 
-#header nav a {
+#header nav:not(.breadcrumbs) a {
   color: var(--text-muted);
   text-decoration: none;
   padding: 0.15em 0.4em;
   border-radius: 3px;
 }
 
-#header nav a:hover {
+#header nav:not(.breadcrumbs) a:hover {
   color: var(--accent);
 }
 

@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { default as generateOG } from './generate-og.mjs';
 import { loadConfig, stripZiggy } from './lib/config.mjs';
 import { buildModel } from './lib/model.mjs';
-import { buildSearchIndex, removeSearchIndex } from './lib/search.mjs';
+import { attachSearchIndex, buildSearchIndex, removeSearchIndex } from './lib/search.mjs';
 import { discoverModules, resolveSlots } from './lib/modules.mjs';
 import { loadI18n } from './lib/i18n.mjs';
 import { bundleCSS } from './lib/css.mjs';
@@ -374,13 +374,13 @@ async function newGenerate() {
   const rendered = await renderZones({ ...model, config: renderConfig }, i18n, ROOT, modules, slots);
   const pageAssets = Object.fromEntries(Object.entries(rendered.pageInstances).map(([pageKey, instances]) => [
     pageKey,
-    buildPageAssets({
+    attachSearchIndex(buildPageAssets({
       pageKey,
       instances: enabledFeatureInstances(config, instances),
       modules,
       root: ROOT,
       includeCriticalStyles: false,
-    }),
+    }), enabledFeatureInstances(config, instances)),
   ]));
   writePageAssets(pageAssets, ROOT);
   const installed = new Set([...rendered.installed].filter(module => !Object.entries(FEATURE_MODULES)

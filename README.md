@@ -1,51 +1,54 @@
-# notizine
+# # notizine
 
-A modular, multilingual static site starter built on [Zine](https://zine-ssg.io).
+a small modular site starter on [zine](https://zine-ssg.io)
 
-**What it does:** Zine is a fast static site generator. Notizine wraps it
-with a config layer so you don't write templates by hand. Configure
-sidebars, features, and layout in one file. Write content in Markdown.
-Get a bilingual site with dark mode, instant client-side search, tags,
-RSS feeds, OG images, and more -- out of the box.
+the interactive bits use plain js with no frontend framework
+css lives inside the page by default and module scripts load only where needed (inline mode - main feature)
 
-A small vanilla JS bundle (~4KB, no framework) handles the interactive
-bits: theme toggle, live search over a prebuilt index, random-note
-navigation, back-to-top. CSS is inlined into pages by default; JS loads
-as one tiny deferred file.
+search starts with a list of every page then filters locally as type, the index and search client load only on pages with the search widget, no extra requests for every letter
 
-## Quick start
+## ## quick start
 
 ```bash
-nix-shell        # provides node, zine, python deps (see shell.nix)
+nix-shell        # brings in the tools from shell.nix
 npm install
-npm run dev      # opens http://localhost:1987
+npm run dev      # http://localhost:1990
 ```
 
-Then:
+then make it urs
 
-1. Edit `content/en/index.smd` -- replace "Welcome" with your own text
-2. Set `host_url` in `zine.ziggy` to your actual domain
-3. Customize `assets/notizine.ziggy` -- toggle features, rearrange modules
-4. `npm run build` -- output in `public/`
+1. replace the text in `content/*`
+2. set `site.host_url` in `assets/notizine.ziggy` to ur domain
+3. tweak features slots and layout in that same config
+4. `npm run sync:zine` to sync site settings into `zine.ziggy`
+5. `npm run build` and grab the site from `public/`
 
-## Where is what
+## ## where stuff lives
 
-| Path | Purpose |
+| path | whats there |
 |------|---------|
-| `content/{en,ru}/*.smd` | Your content (Markdown with Ziggy frontmatter) |
-| `assets/notizine.ziggy` | Notizine config -- features, slots, layout |
-| `zine.ziggy` | Zine config -- host_url, locales, site title |
-| `modules/` | Custom modules -- add your own widgets |
-| `i18n/` | Interface strings -- translate UI labels |
-| `layouts/` | Page templates -- extend if needed |
+| `content/en/` | pages and posts as `.smd` files with markdown and ziggy frontmatter |
+| `assets/notizine.ziggy` | site settings features slots and layout |
+| `zine.ziggy` | zine settings synced from the site config |
+| `modules/` | widgets and their styles scripts and generators |
+| `i18n/` | interface text |
+| `layouts/` | page templates |
 
-## This demo site
+## ## whats in the starter
 
-You're looking at notizine's own documentation, built with notizine.
-The left sidebar lists the **Documentation** tree; the right sidebar
-shows recent **Updates** with an RSS feed at `/updates/index.xml`.
-The header has a **theme toggle**; the footer has badges and an **RSS**
-link. All of this is configured in `assets/notizine.ziggy` -- no
-templates edited.
+a home page an about page and one first post to replace with your own stuff
+plus search tags recent posts a site explorer and a 404 page
 
-Build a blog, a digital garden, a portfolio -- it's all the same starter.
+the left sidebar has the site title theme toggle and page tree
+the right one shows recent posts
+breadcrumbs sit above the content and a small footer sits below
+
+no docs wiki release history promo badges or product links in the footer
+rss is off by default
+
+## ## before u ship
+
+```bash
+npm run ci       # validate test build and check page weight
+npm run preview  # build and serve the result locally
+```

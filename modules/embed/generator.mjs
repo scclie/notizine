@@ -5,7 +5,7 @@
 export default async ({ params }) => {
   const url = params.url || '';
   const height = params.height || '400';
-  const title = params.title || 'Embedded content';
+  const title = params.title || 'embedded content';
   const width = params.width || '100%';
 
   if (!url) return '';

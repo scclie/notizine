@@ -27,6 +27,7 @@ function leaf(locale, link, extra = {}) {
 
 const MODEL = {
   config: {
+    features: { prev_next: true },
     site: {
       locales: [
         { code: 'en', output_prefix_override: '' },
@@ -48,6 +49,23 @@ const MODEL = {
 
 const t = map => key => map[key] ?? key;
 const I18N = t({ recents_title: 'Recent Notes', see_more: 'See more', random_note: 'random note', min_short: 'min', words_short: 'words' });
+
+test('recents omits footer navigation when prev_next is disabled', async () => {
+  const gen = await loadGen('recents');
+  const html = await gen({
+    page: MODEL.pages[1],
+    site: {
+      ...MODEL,
+      config: {
+        ...MODEL.config,
+        features: { prev_next: false },
+      },
+    },
+    params: { section: '/posts/' },
+    i18n: I18N,
+  });
+  assert.ok(!html.includes('recent-footer-bottom'));
+});
 
 test('recents renders items with data-urls JSON of every section link', async () => {
   const gen = await loadGen('recents');

@@ -42,6 +42,19 @@ async function loadGenerator(modules, name, cache) {
   return cache[name].default;
 }
 
+function collectActiveModules(pageZones) {
+  const deliveries = new Map();
+  for (const instance of GRID_CELL_ORDER.flatMap(zone => pageZones[zone]?.flat() ?? [])) {
+    const moduleDeliveries = deliveries.get(instance.module) ?? new Set();
+    moduleDeliveries.add(instance.delivery);
+    deliveries.set(instance.module, moduleDeliveries);
+  }
+  return [...deliveries].map(([name, values]) => ({
+    name,
+    delivery: values.size === 1 ? values.values().next().value : 'mixed',
+  }));
+}
+
 export async function renderZones(model, i18n, root, modules, slots) {
   const genCache = {};
   const tplCache = {};
@@ -52,6 +65,7 @@ export async function renderZones(model, i18n, root, modules, slots) {
   const pageInstances = {};
   for (const page of model.pages.concat(rootPage(model))) {
     const pageZones = applyOverrides(slots.zones, model.config.slots_overrides, page.link, modules);
+    const activeModules = collectActiveModules(pageZones);
     const key = cacheKey(page.link);
     const dir = join(baseDir, key);
     mkdirSync(dir, { recursive: true });
@@ -74,6 +88,7 @@ export async function renderZones(model, i18n, root, modules, slots) {
               cell: zone,
               legacyZone: inst.legacyZone,
               i18n: i18n[page.locale] ?? (k => k),
+              activeModules,
             }) ?? '');
           } catch (e) {
             throw new Error(`instance "${inst.id}" (${inst.module}) on ${page.link}: ${e.message}`);

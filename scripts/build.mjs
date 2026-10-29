@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execSync } from 'node:child_process';
 import { preprocess as mermaidPreprocess, postprocess as mermaidPostprocess } from './lib/mermaid.mjs';
+import { cleanPublicOutput } from './lib/clean-public.mjs';
 
 const ROOT = process.cwd();
 
@@ -41,6 +42,9 @@ async function main() {
       }
     }
     if (mermaidCount > 0) console.log(`[mermaid] Preprocessed ${mermaidCount} files`);
+
+    console.log('[build] Cleaning public output');
+    cleanPublicOutput(ROOT);
 
     console.log('[build] Step 2/4: zine build');
     execSync('zine release --force', { stdio: 'inherit', cwd: ROOT });

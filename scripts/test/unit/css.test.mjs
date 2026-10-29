@@ -91,3 +91,32 @@ test('base template leaves custom CSS ownership to bundleCSS', () => {
   const template = readFileSync(new URL('../../../layouts/templates/base.shtml', import.meta.url), 'utf-8');
   assert.doesNotMatch(template, /custom_css/, 'custom CSS must not be inserted a second time by the template');
 });
+
+test('Nord breadcrumbs wrap with accent links outside generic header-nav controls', () => {
+  const breadcrumbs = readFileSync(new URL('../../../modules/breadcrumbs/style.css', import.meta.url), 'utf-8');
+  const base = readFileSync(new URL('../../../assets/css/base.css', import.meta.url), 'utf-8');
+  const nord = readFileSync(new URL('../../../assets/themes/nord-default.css', import.meta.url), 'utf-8');
+
+  assert.match(breadcrumbs, /\.breadcrumbs\s*\{[^}]*display:\s*flex;[^}]*flex-wrap:\s*wrap;[^}]*align-items:\s*baseline;[^}]*gap:\s*0\.25rem;[^}]*margin:\s*0;[^}]*color:\s*var\(--text-muted\);/s);
+  assert.match(breadcrumbs, /\.breadcrumbs a\s*\{[^}]*color:\s*var\(--accent\);[^}]*text-decoration:\s*underline;[^}]*text-underline-offset:\s*3px;/s);
+  assert.match(breadcrumbs, /\.breadcrumbs :is\(a, span:not\(\.crumb-sep\)\)\s*\{[^}]*min-width:\s*0;[^}]*overflow-wrap:\s*anywhere;/s, 'long breadcrumb links and current-page labels can shrink and wrap');
+  assert.match(breadcrumbs, /\.breadcrumbs \.crumb-sep\s*\{\s*color:\s*var\(--accent2\);\s*\}/);
+  assert.doesNotMatch(base, /#header a\s*\{/, 'generic header links must not override breadcrumb links');
+  assert.match(base, /#header \.site-title\s*\{/, 'site-title styling does not target breadcrumb links');
+  assert.doesNotMatch(base, /#header nav\s*\{/, 'generic header navigation must not override breadcrumb layout');
+  assert.match(base, /#header nav:not\(\.breadcrumbs\)\s*\{/, 'header controls exclude breadcrumb navigation');
+  assert.doesNotMatch(base, /#header nav a\s*\{/, 'generic header-nav links must not override breadcrumb links');
+  assert.match(base, /#header nav:not\(\.breadcrumbs\) a\s*\{/, 'header control links exclude breadcrumb navigation');
+
+  const darkBlocks = [
+    /\[data-theme='dark'\]\s*\{([^}]*)\}/s,
+    /:root:not\(:has\(#theme-dark\)\)\s*\{([^}]*)\}/s,
+    /:root:has\(#theme-dark:checked\)\s*\{([^}]*)\}/s,
+  ];
+  for (const blockPattern of darkBlocks) {
+    const block = nord.match(blockPattern);
+    assert.ok(block, 'missing dark-mode token block');
+    assert.match(block[1], /--fg-muted:\s*#a3be8c;/, 'dark mode uses readable muted text');
+    assert.doesNotMatch(block[1], /--fg-muted:\s*#4c566a;/, 'dark mode does not use unreadable muted text');
+  }
+});

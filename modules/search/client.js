@@ -1,38 +1,65 @@
-const input = document.getElementById('search-input');
-const box = document.getElementById('search-results');
+(() => {
+  const normalize = text => String(text ?? '').normalize('NFKC').toLowerCase();
+  const index = window.SEARCH_INDEX;
+  const available = index && typeof index === 'object' && !Array.isArray(index)
+    && Object.values(index).every(Array.isArray);
+  const seen = new Set();
+  const pages = available ? Object.values(index).flat().filter(page => {
+    if (!page || typeof page.u !== 'string' || !/^\/(?!\/)/.test(page.u)
+      || /[\\\u0000-\u0020]/.test(page.u) || seen.has(page.u)) return false;
+    seen.add(page.u);
+    return true;
+  }).map(page => ({
+    title: String(page.t || page.u), url: page.u,
+    description: String(page.d || ''), body: String(page.x || ''),
+    searchable: normalize(`${page.t || ''}\n${page.d || ''}\n${page.x || ''}`),
+  })) : [];
 
-function snippet(text, q) {
-  const i = text.toLowerCase().indexOf(q);
-  if (i < 0) return '';
-  const start = Math.max(0, i - 60);
-  const end = Math.min(text.length, i + q.length + 90);
-  return (start > 0 ? '…' : '') + text.slice(start, end).trim() + (end < text.length ? '…' : '');
-}
+  function snippet(page, query) {
+    const source = page.description || page.body;
+    const match = query ? normalize(source).indexOf(query) : 0;
+    const start = Math.max(0, match - 60);
+    return (start ? '…' : '') + source.slice(start, start + 160).trim()
+      + (source.length > start + 160 ? '…' : '');
+  }
 
-if (input && box) {
-  let timer = null;
-  input.addEventListener('input', () => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      const q = input.value.trim().toLowerCase();
-      if (!q) { box.innerHTML = ''; return; }
-      const idx = (window.SEARCH_INDEX || {})[input.dataset.locale] || [];
-      const hits = [];
-      for (const p of idx) {
-        const hay = (p.t + '\n' + p.d + '\n' + p.x).toLowerCase();
-        if (!hay.includes(q)) continue;
-        const src = (p.d && p.d.toLowerCase().includes(q)) ? p.d : p.x;
-        hits.push({ ...p, s: snippet(src, q) });
-        if (hits.length >= 30) break;
+  for (const widget of document.querySelectorAll('.search-widget')) {
+    const input = widget.querySelector('.search-input');
+    const box = widget.querySelector('.search-results');
+    if (!input || !box) continue;
+    function render() {
+      const query = normalize(input.value.trim());
+      const hits = pages.filter(page => !query || page.searchable.includes(query));
+      const fragment = document.createDocumentFragment();
+      if (!available || !hits.length) {
+        const message = document.createElement('p');
+        message.textContent = available ? widget.dataset.empty : widget.dataset.unavailable;
+        fragment.append(message);
+      } else {
+        for (const page of hits) {
+          const article = document.createElement('article');
+          article.className = 'recent-row recent-row-block';
+          const head = document.createElement('div');
+          head.className = 'recent-row-head';
+          const title = document.createElement('h2');
+          const link = document.createElement('a');
+          link.href = page.url;
+          link.textContent = page.title;
+          title.append(link);
+          head.append(title);
+          article.append(head);
+          const preview = snippet(page, query);
+          if (preview) {
+            const text = document.createElement('p');
+            text.textContent = preview;
+            article.append(text);
+          }
+          fragment.append(article);
+        }
       }
-      box.innerHTML = hits.length
-        ? hits.map(p =>
-            `<article class="recent-row recent-row-block">` +
-            `<div class="recent-row-head"><h2><a href="${p.u}">${p.t}</a></h2></div>` +
-            (p.s ? `<p>${p.s}</p>` : '') +
-            `</article>`
-          ).join('')
-        : `<article class="recent-row"><p>0</p></article>`;
-    }, 80);
-  });
-}
+      box.replaceChildren(fragment);
+    }
+    input.addEventListener('input', render);
+    render();
+  }
+})();
