@@ -10,6 +10,7 @@
   opacity: 0.5;
 }
 .theme-toggle label:hover { opacity: 0.8; }
+.theme-toggle input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 3px; opacity: 1; }
 .theme-toggle input:checked + label { opacity: 1; }
 .theme-toggle label::after { content: "☀"; }
 .theme-toggle input:checked + label::after { content: "☾"; }

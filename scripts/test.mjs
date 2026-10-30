@@ -174,7 +174,7 @@ const gridCellNames = [
   'middle_left', 'middle_center', 'middle_right',
   'bottom_left', 'bottom_center', 'bottom_right',
 ];
-const rootSlotsSource = configSource.match(/"slots": \{([\s\S]*?)\n  \},\n\n  \/\/ ── Layout/)?.[1] ?? '';
+const rootSlotsSource = configSource.match(/"slots": \{([\s\S]*?)\n  \},/)?.[1] ?? '';
 for (const cell of gridCellNames) {
   assert(new RegExp(`"${cell}"\\s*:`).test(rootSlotsSource), `Personal starter slots explicitly include ${cell}`);
 }

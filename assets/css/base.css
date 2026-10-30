@@ -25,7 +25,7 @@ body {
   justify-items: center;
 }
 
-.grid-cell { min-width: 0; }
+.grid-cell { min-width: 0; width: 100%; overflow-wrap: anywhere; }
 
 .grid-cell-top-left { grid-area: top-left; }
 .grid-cell-top-center { grid-area: top-center; }
@@ -40,13 +40,10 @@ body {
 .grid-cell-top-center,
 .grid-cell-middle-center,
 .grid-cell-bottom-center {
-  width: 100%;
   max-width: var(--page-width, 720px);
 }
 
 .grid-cell-middle-left {
-  width: var(--sidebar-left-max, 300px);
-  min-width: var(--sidebar-left-max, 300px);
   max-width: var(--sidebar-left-max, 300px);
   justify-self: end;
   display: flex;
@@ -55,8 +52,6 @@ body {
 }
 
 .grid-cell-middle-right {
-  width: var(--sidebar-right-max, 300px);
-  min-width: var(--sidebar-right-max, 300px);
   max-width: var(--sidebar-right-max, 300px);
   justify-self: start;
 }
@@ -93,11 +88,6 @@ body {
 
 .module-recents { width: 100%; }
 
-#header {
-  padding-bottom: var(--sp-4, 1rem);
-  margin-bottom: var(--sp-7, 2rem);
-}
-
 #header .site-title {
   font-size: 1.2rem;
   font-weight: 700;
@@ -120,10 +110,6 @@ body {
 
 #header nav:not(.breadcrumbs) a:hover {
   color: var(--accent);
-}
-
-#content {
-  flex: 1;
 }
 
 .page-content h1, .page-content h2, .page-content h3,
@@ -297,14 +283,9 @@ a.tag, .tag {
 }
 
 #footer {
-  margin-top: var(--sp-8, 3rem);
-  padding-top: var(--sp-4, 1rem);
   font-size: 0.85rem;
   color: var(--text-muted);
   text-align: center;
-  max-width: var(--page-width, 720px);
-  margin-left: auto;
-  margin-right: auto;
 }
 
 #footer a {
@@ -336,36 +317,19 @@ a.tag, .tag {
   body { padding: var(--sp-4, 1rem); }
 
   .layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(9, auto);
-    grid-template-areas:
-      "top-left"
-      "top-center"
-      "top-right"
-      "middle-left"
-      "middle-center"
-      "middle-right"
-      "bottom-left"
-      "bottom-center"
-      "bottom-right";
+    grid-template: none / minmax(0, 1fr);
+  }
+
+  .grid-cell {
+    grid-area: auto;
     max-width: 100%;
   }
 
-  .grid-cell-top-center,
-  .grid-cell-middle-center,
-  .grid-cell-bottom-center,
-  .grid-cell-middle-left,
-  .grid-cell-middle-right {
-    max-width: 100%;
-  }
+  .grid-cell:not(:has(> *)) { display: none; }
 
   .grid-cell-middle-left {
     justify-self: start;
     align-items: stretch;
-  }
-
-  #footer {
-    max-width: 100%;
   }
 
   .page-content h1 { font-size: 1.5rem; }
