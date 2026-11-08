@@ -22,7 +22,7 @@ export default async function ({ page, site, params, i18n }) {
   const hidden = page.isSection || ['/recents/', '/tags/', '/search/', '/explorer/'].includes(page.link);
   const ownBranch = page.link.startsWith(section) || page.parentLink?.startsWith(section);
   let nav = '';
-  if (!hidden && ownBranch && site.config.features?.prev_next) {
+  if (!hidden && ownBranch && site.config.features?.prev_next_recents) {
     const sibs = sectionSiblingsOf(site, page, section);
     const idx = sibs.findIndex(p => p.link === page.link);
     const prev = idx > 0 ? sibs[idx - 1] : null;

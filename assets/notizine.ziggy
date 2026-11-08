@@ -19,7 +19,8 @@
     "og_images": true,          // 1200×630 png previews for shared links
     "rss": false,               // feed + discovery link + optional footer link
     "inline_mode": true,        // css inside <style> instead of a separate request
-    "prev_next": false,         // prev and next post links
+    "prev_next_content": false, // Previous/Next links inside an article
+    "prev_next_recents": false, // Previous/Next links in the Recents module
     "mermaid": false            // build diagrams ahead of time needs mermaid-cli
   },
 

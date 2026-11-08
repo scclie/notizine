@@ -24,7 +24,7 @@
           </ctx>
         </ctx>
       </ctx>
-      <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('prev_next')">
+      <ctx :if="$site.asset('notizine.ziggy').ziggy().get('features').get('prev_next_content')">
         <ctx :if="$page.hasPrev().or($page.hasNext())">
           <nav>
             <ctx :if="$page.prevPage?()">
